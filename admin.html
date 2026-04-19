@@ -34,6 +34,7 @@
       <p class="admin-hero__eyebrow">SELLER CONSOLE</p>
       <h1 id="admin-title">後台管理</h1>
       <p>每筆商品以<strong>橫向滑動開關</strong>切換：<strong>綠色（右開）</strong>為上架，顧客會在首頁看到商品卡；<strong>灰色（左關）</strong>為下架，顧客看不到、也無法加購。下方可<strong>新增商品（本機）</strong>，欄位與 <code>data.js</code> 的 <code>GACHA_PRODUCTS</code> 一致。上下架狀態可儲存為<strong>本機覆寫</strong>；正式營運請同步更新試算表或 JSON。</p>
+      <p class="admin-sync-note" id="admin-sheet-sync-note" role="status"></p>
     </section>
 
     <section class="admin-stats" aria-label="上架統計">
@@ -57,6 +58,8 @@
         <p>
           商品清單來自 <code>data.js</code> 的 <code>GACHA_PRODUCTS</code>，若設定了 <code>GACHA_DATA_URL</code> 則優先使用遠端 JSON。
           「儲存設定」寫入上架覆寫（鍵：<code id="admin-key-hint"></code>）。本機新增／覆寫的商品存於（鍵：<code id="admin-extra-key-hint"></code>），同編號時<strong>覆寫</strong>雲端／本檔條目。
+          試算表<strong>不會自動</strong>寫入；需在下方「新增商品」勾選<strong>同步寫入試算表</strong>並填 <code>ADMIN_TOKEN</code>（與 Apps Script 指令碼屬性相同）。
+          可將 <code>GACHA_AUTO_SYNC_SHEET</code> 設為 <code>true</code> 以預設勾選同步（仍須填權杖）。
         </p>
       </section>
       <section class="admin-panel" aria-labelledby="panel-how">
@@ -71,7 +74,8 @@
     <section class="admin-form-card" aria-labelledby="admin-add-title">
       <h2 id="admin-add-title" class="admin-form-card__title">新增商品（本機）</h2>
       <p class="admin-form-card__hint">
-        必填：名稱、系列。編號留空則自動產生。規格為 JSON 陣列，可留空。與試算表同編號時會以本表單覆寫該筆（仍須「儲存設定」才會寫入上下架覆寫）。圖片可用手機<strong>相簿或拍照</strong>上傳，會在瀏覽器內壓縮後存於本機；圖勿過大以免超出儲存上限。
+        必填：名稱、系列。編號留空則自動產生。規格為 JSON 陣列，可留空。與試算表同編號時會以本表單覆寫該筆（仍須「儲存設定」才會寫入上下架覆寫）。
+        若在 <code>data.js</code> 設定 <strong>Cloudinary</strong>（cloud name、unsigned preset、選填 folder），選圖會<strong>自動上傳雲端</strong>並填入主圖／圖集網址；未設定則改為本機壓縮（Data URL）。
       </p>
       <form id="admin-add-form" class="admin-form" novalidate>
         <div class="admin-form__grid">
@@ -136,10 +140,6 @@
             <span class="admin-field__label">說明</span>
             <textarea id="admin-field-description" name="description" rows="3"></textarea>
           </label>
-          <label class="admin-field admin-field--full">
-            <span class="admin-field__label">規格（JSON 陣列）</span>
-            <textarea id="admin-field-specs" name="specs" rows="2" spellcheck="false" placeholder='[{"k":"尺寸","v":"約 5cm"}]'></textarea>
-          </label>
           <label class="admin-field">
             <span class="admin-field__label">已購人次（可選）</span>
             <input type="number" id="admin-field-purchaseCount" name="purchaseCount" min="0" step="1" placeholder="例：12" />
@@ -159,6 +159,25 @@
           <legend class="admin-form__legend">狀態</legend>
           <label class="admin-check"><input type="checkbox" id="admin-field-comingSoon" name="comingSoon" /> 待上市</label>
           <label class="admin-check"><input type="checkbox" id="admin-field-published" name="published" checked /> 預設上架（資料欄 published）</label>
+        </fieldset>
+        <fieldset class="admin-form__fieldset admin-form__fieldset--sheet" aria-labelledby="admin-sheet-legend">
+          <legend class="admin-form__legend" id="admin-sheet-legend">Google 試算表（選用）</legend>
+          <p class="admin-sheet-hint">
+            預設<strong>只存瀏覽器本機</strong>。若要<strong>同時新增一列</strong>到第 1 張分頁，請勾選並填寫與 Apps Script「專案設定 → 指令碼屬性」相同的 <code>ADMIN_TOKEN</code>，且須已<strong>重新部署</strong> Web App（含 doPost）。
+          </p>
+          <label class="admin-check">
+            <input type="checkbox" id="admin-sync-sheet" name="syncSheet" /> 加入後同步寫入試算表
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">ADMIN_TOKEN</span>
+            <input
+              type="password"
+              id="admin-sheet-token"
+              name="sheetToken"
+              autocomplete="off"
+              placeholder="與指令碼屬性 ADMIN_TOKEN 相同"
+            />
+          </label>
         </fieldset>
         <div class="admin-form__actions">
           <button type="submit" class="btn primary" id="admin-add-submit">加入商品</button>
