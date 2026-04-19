@@ -124,8 +124,11 @@
     if (!data.ok) {
       const err = String(data.error || "寫入失敗");
       if (err === "unauthorized") throw new Error("ADMIN_TOKEN 與指令碼屬性不一致");
-      if (err === "未設定 ADMIN_TOKEN" || err.indexOf("ADMIN_TOKEN") !== -1)
-        throw new Error("Apps Script 未設定指令碼屬性 ADMIN_TOKEN");
+      // 僅在伺服器明確回傳此字串時提示「未設定」（勿用 error 內含 ADMIN_TOKEN 就套用，以免掩蓋其他錯誤）
+      if (err === "未設定 ADMIN_TOKEN")
+        throw new Error(
+          "Apps Script 讀不到指令碼屬性 ADMIN_TOKEN。請開啟「與 GACHA_DATA_URL 同一個」Apps Script 專案 → 齒輪 → 專案設定 → 指令碼屬性 → 新增鍵 ADMIN_TOKEN（全大寫）並儲存，再重試。"
+        );
       if (err.indexOf("SPREADSHEET_ID") !== -1) throw new Error("Apps Script 未設定指令碼屬性 SPREADSHEET_ID");
       throw new Error(err);
     }
