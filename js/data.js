@@ -30,7 +30,7 @@ window.HERO_BANNERS = [
  * @example "https://script.google.com/macros/s/XXXX/exec"
  * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-window.GACHA_DATA_URL = "";
+window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0I3niJfoAzm90ASuD4W2SVWnHS8bZQgV_QWPQ33eQK4UkTuZcLBCCLA/exec";
 
 /**
  * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
