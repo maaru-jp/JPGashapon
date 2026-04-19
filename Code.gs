@@ -55,7 +55,7 @@ function readJpyToTwdRate_(ss) {
  */
 function doPost(e) {
   var props = PropertiesService.getScriptProperties();
-  var expect = props.getProperty("acha_2026!Seller#A9");
+  var expect = props.getProperty("ADMIN_TOKEN");
   if (!expect) {
     return jsonResponse_({ ok: false, error: "未設定 ADMIN_TOKEN" });
   }
