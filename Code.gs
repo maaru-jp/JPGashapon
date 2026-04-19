@@ -15,7 +15,7 @@
  *   其餘列：日幣檔位與台幣參考（第一欄日幣、第二欄台幣）；可有標題列（非數字會自動略過）。
  *
  * 部署：部署 → 新增部署作業 → 類型「網路應用程式」→ 存取「任何人」→ 取得網址填入 data.js 的 GACHA_DATA_URL
- */
+ */PREADSHEET_ID
 
 var INDEX_SHEET_PRODUCTS = 0;
 var INDEX_SHEET_RATES = 1;
@@ -74,7 +74,7 @@ function doPost(e) {
 }
 
 function getSpreadsheet_() {
-  var id = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+  var id = PropertiesService.getScriptProperties().getProperty("https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0I3niJfoAzm90ASuD4W2SVWnHS8bZQgV_QWPQ33eQK4UkTuZcLBCCLA/exec");
   if (!id) throw new Error("請在指令碼屬性設定 SPREADSHEET_ID");
   return SpreadsheetApp.openById(id);
 }
