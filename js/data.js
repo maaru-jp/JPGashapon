@@ -42,7 +42,7 @@ window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0
  */
 window.GACHA_CLOUDINARY_CLOUD_NAME = "DTLL13ZAX";
 window.GACHA_CLOUDINARY_UPLOAD_PRESET = "icn59m22";
-window.GACHA_CLOUDINARY_FOLDER = "icn59m22";
+window.GACHA_CLOUDINARY_FOLDER = "";
 
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
