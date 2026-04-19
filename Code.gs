@@ -57,7 +57,7 @@ function doPost(e) {
   var props = PropertiesService.getScriptProperties();
   var expect = props.getProperty("ADMIN_TOKEN");
   if (!expect) {
-    return jsonResponse_({ ok: false, error: "未設定 ADMIN_TOKEN" });
+    return jsonResponse_({ ok: false, error: "acha_2026!Seller#A9" });
   }
   try {
     if (!e.postData || !e.postData.contents) {
