@@ -3,9 +3,148 @@
 
   const KEY = window.GACHA_PUBLISHED_STORAGE_KEY || "gacha-published-overrides-v1";
   const EXTRA_KEY = window.GACHA_EXTRA_PRODUCTS_KEY || "gacha-products-extra-v1";
+  const SHEET_TOKEN_KEY = "gacha-admin-sheet-token-v1";
 
   /** @type {Record<string, unknown>[]} */
   let productsCache = [];
+
+  /**
+   * 轉成試算表可寫入的純值（陣列改 JSON 字串／逗號分隔）
+   * @param {Record<string, unknown>} p
+   */
+  function productForSheet(p) {
+    const o = { ...p };
+    if (Array.isArray(o.specs)) o.specs = JSON.stringify(o.specs);
+    if (Array.isArray(o.labels)) o.labels = o.labels.join(",");
+    if (Array.isArray(o.gallery)) o.gallery = o.gallery.join("|");
+    if (typeof o.jpy === "string") {
+      const n = parseInt(o.jpy, 10);
+      o.jpy = Number.isNaN(n) ? 0 : n;
+    }
+    return o;
+  }
+
+  /**
+   * POST 至 Apps Script Web App，寫入試算表一列（需指令碼屬性 ADMIN_TOKEN）
+   * @param {Record<string, unknown>} product
+   * @param {string} token
+   */
+  function isCloudinaryConfigured() {
+    const c = (window.GACHA_CLOUDINARY_CLOUD_NAME || "").trim();
+    const p = (window.GACHA_CLOUDINARY_UPLOAD_PRESET || "").trim();
+    return !!c && !!p;
+  }
+
+  /**
+   * @param {Blob} blob
+   * @returns {Promise<string>} secure_url
+   */
+  async function uploadBlobToCloudinary(blob) {
+    const cloud = (window.GACHA_CLOUDINARY_CLOUD_NAME || "").trim();
+    const preset = (window.GACHA_CLOUDINARY_UPLOAD_PRESET || "").trim();
+    if (!cloud || !preset) throw new Error("未設定 GACHA_CLOUDINARY_CLOUD_NAME／UPLOAD_PRESET");
+    const fd = new FormData();
+    fd.append("file", blob, "gacha.jpg");
+    fd.append("upload_preset", preset);
+    const folder = (window.GACHA_CLOUDINARY_FOLDER || "").trim();
+    if (folder) fd.append("folder", folder);
+    const res = await fetch("https://api.cloudinary.com/v1_1/" + encodeURIComponent(cloud) + "/image/upload", {
+      method: "POST",
+      body: fd,
+    });
+    const data = await res.json().catch(function () {
+      return {};
+    });
+    if (data.error) throw new Error(data.error.message || "Cloudinary 上傳失敗");
+    if (!data.secure_url) throw new Error("Cloudinary 未回傳網址");
+    return String(data.secure_url);
+  }
+
+  /**
+   * 壓縮後上傳 Cloudinary（已設定時）或回傳 Data URL（未設定時）
+   * @param {File} file
+   * @returns {Promise<string>}
+   */
+  async function processImageFileForUpload(file) {
+    const dataUrl = await compressImageFileToDataUrl(file);
+    if (!isCloudinaryConfigured()) return dataUrl;
+    const blob = await fetch(dataUrl)
+      .then(function (r) {
+        return r.blob();
+      })
+      .catch(function () {
+        throw new Error("無法轉成圖片檔上傳");
+      });
+    return uploadBlobToCloudinary(blob);
+  }
+
+  async function postProductToSheet(product, token) {
+    const url = (window.GACHA_DATA_URL || "").trim();
+    if (!url) throw new Error("請在 js/data.js 設定 GACHA_DATA_URL（與讀取商品相同的 Web App 網址）");
+    if (url.indexOf("/dev") !== -1) {
+      console.warn("[admin] 請使用「部署」後的 /exec 網址，勿使用 /dev");
+    }
+    const t = String(token || "").trim();
+    if (!t) throw new Error("請填寫 ADMIN_TOKEN");
+    const body = JSON.stringify({ token: t, product: productForSheet(product) });
+    const init = {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+    };
+    let res;
+    try {
+      res = await fetch(url, init);
+    } catch (err) {
+      try {
+        await fetch(url, { ...init, mode: "no-cors" });
+      } catch {
+        /* ignore */
+      }
+      throw new Error(
+        "無法連線或取得回應（常見：瀏覽器跨網域限制）。請打開試算表看是否已新增列；若沒有，請到 Apps Script「執行作業」查看 doPost 錯誤。確認網址為部署的 https://script.google.com/.../exec（非 /dev）。"
+      );
+    }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error("HTTP " + res.status + (errText ? "：" + errText.slice(0, 200) : ""));
+    }
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      const preview = String(text).replace(/\s+/g, " ").slice(0, 160);
+      throw new Error(
+        "伺服器回傳非 JSON（前 160 字）：" +
+          preview +
+          "。請確認貼入的是 Web App「部署」網址（/exec），不是編輯器預覽連結。"
+      );
+    }
+    if (!data.ok) {
+      const err = String(data.error || "寫入失敗");
+      if (err === "unauthorized") throw new Error("ADMIN_TOKEN 與指令碼屬性不一致");
+      if (err === "未設定 ADMIN_TOKEN" || err.indexOf("ADMIN_TOKEN") !== -1)
+        throw new Error("Apps Script 未設定指令碼屬性 ADMIN_TOKEN");
+      if (err.indexOf("SPREADSHEET_ID") !== -1) throw new Error("Apps Script 未設定指令碼屬性 SPREADSHEET_ID");
+      throw new Error(err);
+    }
+  }
+
+  function setSheetSyncHint() {
+    const el = document.getElementById("admin-sheet-sync-note");
+    if (!el) return;
+    const url = (window.GACHA_DATA_URL || "").trim();
+    if (!url) {
+      el.hidden = false;
+      el.textContent =
+        "若要寫入 Google 試算表：請先在 js/data.js 設定 GACHA_DATA_URL（Web App 部署後的 /exec 網址，勿用 /dev）。僅切換列表「上下架」並按「儲存設定」不會新增試算表列。";
+      return;
+    }
+    el.hidden = false;
+    el.textContent =
+      "「新增商品」表單內請勾選「同步寫入試算表」並填 ADMIN_TOKEN，按下「加入商品」後才會在試算表新增一列。僅調整列表開關＋儲存設定＝只改本機上架狀態，不會寫入試算表。";
+  }
 
   function loadExtraProducts() {
     try {
@@ -377,7 +516,11 @@
     if (!el) return;
     const url = (window.GACHA_DATA_URL || "").trim();
     if (url) {
-      el.textContent = "資料：遠端 JSON";
+      if (url.indexOf("script.google.com") !== -1) {
+        el.textContent = "資料：Google 試算表";
+      } else {
+        el.textContent = "資料：遠端 JSON";
+      }
       el.classList.add("admin-badge--live");
       el.title = url;
     } else {
@@ -411,6 +554,16 @@
     const accent = (document.getElementById("admin-field-accent")?.value || "").trim();
     const gallery = (document.getElementById("admin-field-gallery")?.value || "").trim();
     const description = (document.getElementById("admin-field-description")?.value || "").trim();
+    const specsRaw = (document.getElementById("admin-field-specs")?.value || "").trim();
+    let specs = [];
+    if (specsRaw) {
+      try {
+        const parsed = JSON.parse(specsRaw);
+        specs = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return { id, name, series, error: "規格須為有效的 JSON 陣列。" };
+      }
+    }
 
     const pcEl = document.getElementById("admin-field-purchaseCount");
     const pcRaw = pcEl && "value" in pcEl ? String(pcEl.value || "").trim() : "";
@@ -436,6 +589,7 @@
       accent,
       gallery: gallery || "",
       description,
+      specs,
       purchaseCount,
       launchNote,
       labels,
@@ -447,6 +601,7 @@
   async function bootstrap() {
     setKeyHints();
     setDataSourceBadge();
+    setSheetSyncHint();
     const host = document.getElementById("admin-table-host");
     if (host) host.innerHTML = '<p class="admin-loading" id="admin-loading">正在載入商品…</p>';
 
@@ -462,6 +617,32 @@
   document.addEventListener("DOMContentLoaded", () => {
     void bootstrap();
 
+    try {
+      const tok = sessionStorage.getItem(SHEET_TOKEN_KEY);
+      const el = document.getElementById("admin-sheet-token");
+      if (tok && el instanceof HTMLInputElement) el.value = tok;
+    } catch {
+      /* ignore */
+    }
+    try {
+      if (window.GACHA_AUTO_SYNC_SHEET && (window.GACHA_DATA_URL || "").trim()) {
+        const syncEl = document.getElementById("admin-sync-sheet");
+        if (syncEl instanceof HTMLInputElement) syncEl.checked = true;
+      }
+    } catch {
+      /* ignore */
+    }
+    document.getElementById("admin-sheet-token")?.addEventListener("change", () => {
+      const el = document.getElementById("admin-sheet-token");
+      if (el instanceof HTMLInputElement) {
+        try {
+          sessionStorage.setItem(SHEET_TOKEN_KEY, el.value.trim());
+        } catch {
+          /* ignore */
+        }
+      }
+    });
+
     document.getElementById("admin-btn-pick-main")?.addEventListener("click", () => {
       document.getElementById("admin-file-main")?.click();
     });
@@ -470,12 +651,12 @@
       if (!(t instanceof HTMLInputElement) || !t.files || !t.files[0]) return;
       const file = t.files[0];
       t.value = "";
-      compressImageFileToDataUrl(file)
-        .then((dataUrl) => {
+      processImageFileForUpload(file)
+        .then((url) => {
           const ta = document.getElementById("admin-field-image");
-          if (ta instanceof HTMLTextAreaElement) ta.value = dataUrl;
-          setMainImagePreview(dataUrl);
-          setFeedback("已設為主圖（已壓縮）。", "ok");
+          if (ta instanceof HTMLTextAreaElement) ta.value = url;
+          setMainImagePreview(url);
+          setFeedback(isCloudinaryConfigured() ? "已上傳 Cloudinary 並設為主圖。" : "已設為主圖（已壓縮）。", "ok");
         })
         .catch((err) => setFeedback(String(err.message || err), "err"));
     });
@@ -493,15 +674,20 @@
       let chain = Promise.resolve();
       files.forEach((file) => {
         chain = chain.then(() =>
-          compressImageFileToDataUrl(file).then((dataUrl) => {
+          processImageFileForUpload(file).then((url) => {
             const cur = ta.value.trim();
-            ta.value = cur ? cur + " | " + dataUrl : dataUrl;
+            ta.value = cur ? cur + " | " + url : url;
             refreshGalleryPreview();
           })
         );
       });
       chain
-        .then(() => setFeedback("已加入 " + files.length + " 張圖片。", "ok"))
+        .then(() =>
+          setFeedback(
+            (isCloudinaryConfigured() ? "已上傳 Cloudinary 並加入 " : "已加入 ") + files.length + " 張圖片。",
+            "ok"
+          )
+        )
         .catch((err) => setFeedback(String(err.message || err), "err"));
     });
 
@@ -526,12 +712,15 @@
           setFeedback("請拖入圖片檔。", "err");
           return;
         }
-        compressImageFileToDataUrl(f)
-          .then((dataUrl) => {
+        processImageFileForUpload(f)
+          .then((url) => {
             const ta = document.getElementById("admin-field-image");
-            if (ta instanceof HTMLTextAreaElement) ta.value = dataUrl;
-            setMainImagePreview(dataUrl);
-            setFeedback("已設為主圖（拖曳上傳）。", "ok");
+            if (ta instanceof HTMLTextAreaElement) ta.value = url;
+            setMainImagePreview(url);
+            setFeedback(
+              isCloudinaryConfigured() ? "已上傳 Cloudinary 並設為主圖（拖曳）。" : "已設為主圖（拖曳上傳）。",
+              "ok"
+            );
           })
           .catch((err) => setFeedback(String(err.message || err), "err"));
       });
@@ -632,6 +821,14 @@
         return;
       }
       const row = /** @type {Record<string, unknown>} */ (out);
+      const sync = !!document.getElementById("admin-sync-sheet")?.checked;
+      const tokenEl = document.getElementById("admin-sheet-token");
+      const token = tokenEl instanceof HTMLInputElement ? tokenEl.value : "";
+      if (sync && !String(token).trim()) {
+        setFeedback("已勾選同步試算表，請填寫 ADMIN_TOKEN（與 Apps Script 指令碼屬性相同）。", "err");
+        return;
+      }
+
       const pid = String(row.id);
       const list = loadExtraProducts().filter((x) => String(x.id) !== pid);
       list.push(row);
@@ -646,15 +843,55 @@
         }
         return;
       }
-      setFeedback("已加入本機商品「" + String(row.name) + "」。請重新整理首頁查看。", "ok");
-      const form = document.getElementById("admin-add-form");
-      if (form instanceof HTMLFormElement) form.reset();
-      clearUploadUI();
-      const jpyEl = document.getElementById("admin-field-jpy");
-      if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
-      const pubEl = document.getElementById("admin-field-published");
-      if (pubEl instanceof HTMLInputElement) pubEl.checked = true;
-      void bootstrap();
+
+      const baseOk = "已加入本機商品「" + String(row.name) + "」。";
+      if (sync) {
+        void postProductToSheet(row, token)
+          .then(() => {
+            try {
+              sessionStorage.setItem(SHEET_TOKEN_KEY, String(token).trim());
+            } catch {
+              /* ignore */
+            }
+            setFeedback(baseOk + " 試算表已新增一列（請重新整理確認）。", "ok");
+          })
+          .catch((err) => {
+            setFeedback(baseOk + " 試算表寫入失敗：" + String(err.message || err), "err");
+          })
+          .finally(() => {
+            const form = document.getElementById("admin-add-form");
+            if (form instanceof HTMLFormElement) form.reset();
+            clearUploadUI();
+            const jpyEl = document.getElementById("admin-field-jpy");
+            if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
+            const pubEl = document.getElementById("admin-field-published");
+            if (pubEl instanceof HTMLInputElement) pubEl.checked = true;
+            const syncEl = document.getElementById("admin-sync-sheet");
+            if (syncEl instanceof HTMLInputElement) syncEl.checked = false;
+            try {
+              const tok = sessionStorage.getItem(SHEET_TOKEN_KEY);
+              const tel = document.getElementById("admin-sheet-token");
+              if (tok && tel instanceof HTMLInputElement) tel.value = tok;
+            } catch {
+              /* ignore */
+            }
+            void bootstrap();
+          });
+      } else {
+        setFeedback(
+          baseOk +
+            " 請重新整理首頁查看。（未勾選「同步寫入試算表」時，Google 試算表不會新增列。）",
+          "ok"
+        );
+        const form = document.getElementById("admin-add-form");
+        if (form instanceof HTMLFormElement) form.reset();
+        clearUploadUI();
+        const jpyEl = document.getElementById("admin-field-jpy");
+        if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
+        const pubEl = document.getElementById("admin-field-published");
+        if (pubEl instanceof HTMLInputElement) pubEl.checked = true;
+        void bootstrap();
+      }
     });
   });
 })();
