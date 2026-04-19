@@ -28,8 +28,26 @@ window.HERO_BANNERS = [
  * 留空則完全使用本檔 GACHA_PRODUCTS／GACHA_JPY_TO_TWD／HERO_BANNERS。
  * 若 JSON 含 jpyToTwdRate（正數），前台以「日幣 × 匯率」計台幣；否則仍可用 jpyToTwd 檔位表。
  * @example "https://script.google.com/macros/s/XXXX/exec"
+ * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
 window.GACHA_DATA_URL = "";
+
+/**
+ * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
+ * 主控台 → Settings → Upload → Upload presets → Add upload preset → Signing mode: Unsigned，
+ * 並在 preset 內設定 Asset folder 或允許 API 傳入 folder（依你的 Cloudinary 設定）。
+ * @example cloudName: "abcd1234"（Dashboard 網址 / 帳戶名稱）
+ * @example uploadPreset: "gacha_unsigned"
+ * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
+ */
+window.GACHA_CLOUDINARY_CLOUD_NAME = "491e7edae6dd1f07efb907fed72a9d";
+window.GACHA_CLOUDINARY_UPLOAD_PRESET = "icn59m22";
+window.GACHA_CLOUDINARY_FOLDER = "icn59m22";
+
+/**
+ * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
+ */
+window.GACHA_AUTO_SYNC_SHEET = false;
 
 /**
  * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
