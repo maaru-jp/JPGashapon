@@ -288,39 +288,6 @@ a.btn {
   line-height: 1.55;
 }
 
-.howto-seller {
-  margin: 0.85rem 0 0;
-  padding-top: 0.75rem;
-  border-top: 1px dashed rgba(28, 28, 30, 0.12);
-  font-size: 0.8rem;
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.howto-seller__label {
-  display: inline-block;
-  margin-right: 0.35rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.howto-seller__link {
-  color: var(--text-secondary);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.howto-seller__link:hover {
-  color: var(--accent-red);
-}
-
-.howto-seller__hint {
-  display: inline;
-  margin-left: 0.2rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
 /* Hero carousel */
 .hero-carousel {
   padding: 1.25rem clamp(1rem, 4vw, 2rem) 0.5rem;
@@ -1832,20 +1799,6 @@ body.modal-open {
 
 .site-footer p + p {
   margin-top: 0.55rem;
-}
-
-.site-footer__meta {
-  font-size: 0.72rem;
-}
-
-.site-footer__admin {
-  color: var(--muted);
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
-.site-footer__admin:hover {
-  color: var(--text-secondary);
 }
 
 /* Reduced motion */

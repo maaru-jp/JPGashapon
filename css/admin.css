@@ -117,6 +117,22 @@
   max-width: 42rem;
 }
 
+.admin-sync-note {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  max-width: 46rem;
+}
+
+.admin-sync-note:empty {
+  display: none;
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -298,6 +314,27 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.65rem 1rem;
+}
+
+.admin-form__fieldset--sheet {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.admin-sheet-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  width: 100%;
+}
+
+.admin-sheet-hint code {
+  font-size: 0.76rem;
+  padding: 0.1rem 0.3rem;
+  background: #f3f4f6;
+  border-radius: 4px;
 }
 
 .admin-form__legend {
