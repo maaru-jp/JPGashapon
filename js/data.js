@@ -30,24 +30,24 @@ window.HERO_BANNERS = [
  * @example "https://script.google.com/macros/s/XXXX/exec"
  * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-abxnqY74f9DZKVlZNXPvEQAcX8iXls8m1isTD5_VLce0k6JPdD9ievg/exec";
+window.GACHA_DATA_URL = "";
 
 /**
  * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
  * 主控台 → Settings → Upload → Upload presets → Add upload preset → Signing mode: Unsigned，
  * 並在 preset 內設定 Asset folder 或允許 API 傳入 folder（依你的 Cloudinary 設定）。
- * @example cloudName: "dtll13zax"（Dashboard 網址 / 帳戶名稱）
- * @example uploadPreset: "wjfvrgv3"
- * @example folder: "Gashapon"（選填；與 preset 權限需一致）
+ * @example cloudName: "abcd1234"（Dashboard 網址 / 帳戶名稱）
+ * @example uploadPreset: "gacha_unsigned"
+ * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
  */
-window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
-window.GACHA_CLOUDINARY_UPLOAD_PRESET = "wjfvrgv3";
-window.GACHA_CLOUDINARY_FOLDER = "Gashapon";
+window.GACHA_CLOUDINARY_CLOUD_NAME = "";
+window.GACHA_CLOUDINARY_UPLOAD_PRESET = "";
+window.GACHA_CLOUDINARY_FOLDER = "";
 
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
  */
-window.GACHA_AUTO_SYNC_SHEET = true;
+window.GACHA_AUTO_SYNC_SHEET = false;
 
 /**
  * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
