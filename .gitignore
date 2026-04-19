@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 若日後加入機密設定，勿提交（可改為 .env.example 範本）
+.env
+.env.local
