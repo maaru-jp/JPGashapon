@@ -1,180 +1,365 @@
 /**
- * 扭蛋連線 · Google 試算表 → 公開 JSON
- *
- * 設定（專案設定 → 指令碼屬性）：
- *   SPREADSHEET_ID  試算表 ID（網址 /d/ 與 /edit 之間）
- *   ADMIN_TOKEN     （選用）doPost 新增列時驗證用密語
- *
- * 分頁順序（由左至右）：
- *   第 1 張：商品（第一列為標題列，欄位名稱見試算表欄位說明.txt）
- *   第 2 張：匯率設定（見下方）
- *   第 3 張（選填）：名稱須為 HeroBanners，首頁輪播；無此分頁則用前端 data.js
- *
- * 【第 2 張分頁】
- *   B1：可填「每 1 日幣合幾元台幣」正數小數（例 0.22），JSON 會帶 jpyToTwdRate；留白則不依單一匯率計價。
- *   其餘列：日幣檔位與台幣參考（第一欄日幣、第二欄台幣）；可有標題列（非數字會自動略過）。
- *
- * 部署：部署 → 新增部署作業 → 類型「網路應用程式」→ 存取「任何人」→ 取得網址填入 data.js 的 GACHA_DATA_URL
+ * 首頁大型 Banner：連線前可改文案與配色（gradient）。
+ * 亦可將 image 設為圖片網址，會以背景圖顯示（需搭配 object 區域）。
  */
-
-var INDEX_SHEET_PRODUCTS = 0;
-var INDEX_SHEET_RATES = 1;
-var SHEET_HERO = "HeroBanners";
-
-function doGet() {
-  var ss = getSpreadsheet_();
-  var payload = {
-    jpyToTwd: readJpyToTwd_(ss),
-    jpyToTwdRate: readJpyToTwdRate_(ss),
-    heroBanners: readHeroBanners_(ss),
-    products: readProducts_(ss),
-  };
-  return jsonResponse_(payload);
-}
-
-/** 依索引取得分頁；超出範圍回傳 null */
-function getSheetByIndex_(ss, index) {
-  var sheets = ss.getSheets();
-  if (index < 0 || index >= sheets.length) return null;
-  return sheets[index];
-}
-
-/** 第二張分頁 B1：單一匯率（每 1 日幣 → 台幣） */
-function readJpyToTwdRate_(ss) {
-  var sh = getSheetByIndex_(ss, INDEX_SHEET_RATES);
-  if (!sh) return null;
-  var v = sh.getRange("B1").getValue();
-  if (typeof v === "number" && v > 0 && v <= 3) return v;
-  return null;
-}
+window.HERO_BANNERS = [
+  {
+    title: "東京連線｜扭蛋新鮮貨",
+    sub: "本週連線限定 · 即時更新庫存",
+    gradient: "linear-gradient(118deg, #fff5f7 0%, #fce7f3 35%, #fbcfe8 70%, #fda4af 100%)",
+    tag: "NEW",
+  },
+  {
+    title: "人氣 IP 一次收齊",
+    sub: "吉伊卡哇 · 寶可夢 · 三麗鷗 熱賣中",
+    gradient: "linear-gradient(118deg, #ecfeff 0%, #cffafe 40%, #a5f3fc 85%, #67e8f9 100%)",
+    tag: "HOT",
+  },
+  {
+    title: "選好商品 · 一鍵複製下單",
+    sub: "貼到官方 LINE，小幫手與您確認金額與取貨",
+    gradient: "linear-gradient(118deg, #fffbeb 0%, #fef3c7 38%, #fde68a 78%, #fcd34d 100%)",
+    tag: "HOW",
+  },
+];
 
 /**
- * 後台新增一筆商品（建議僅自用；圖片請先上傳 Cloudinary 取得 URL 再放入 JSON）。
- * POST JSON：{ "token": "與 ADMIN_TOKEN 相同", "product": { ...欄位與試算表相同 } }
+ * 公開資料 JSON 網址（Google Apps Script Web App 部署後的網址等）。
+ * 留空則完全使用本檔 GACHA_PRODUCTS／GACHA_JPY_TO_TWD／HERO_BANNERS。
+ * 若 JSON 含 jpyToTwdRate（正數），前台以「日幣 × 匯率」計台幣；否則仍可用 jpyToTwd 檔位表。
+ * @example "https://script.google.com/macros/s/XXXX/exec"
+ * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-function doPost(e) {
-  var props = PropertiesService.getScriptProperties();
-  var expect = props.getProperty("acha_2026!Seller#A9");
-  if (!expect) {
-    return jsonResponse_({ ok: false, error: "未設定 ADMIN_TOKEN" });
-  }
-  try {
-    if (!e.postData || !e.postData.contents) {
-      return jsonResponse_({ ok: false, error: "empty_post_body" });
-    }
-    var body = JSON.parse(e.postData.contents);
-    if (body.token !== expect) {
-      return jsonResponse_({ ok: false, error: "unauthorized" });
-    }
-    if (!body.product || typeof body.product !== "object") {
-      return jsonResponse_({ ok: false, error: "missing product" });
-    }
-    appendProductRow_(body.product);
-    return jsonResponse_({ ok: true });
-  } catch (err) {
-    return jsonResponse_({ ok: false, error: String(err) });
-  }
-}
-
-function getSpreadsheet_() {
-  var id = PropertiesService.getScriptProperties().getProperty("1NDa6vyEIxIHUlD9fPZPzgL7o5JBcmngfLiu5RlcyK9c");
-  if (!id) throw new Error("請在指令碼屬性設定 SPREADSHEET_ID");
-  return SpreadsheetApp.openById(id);
-}
-
-function jsonResponse_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}
+window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0I3niJfoAzm90ASuD4W2SVWnHS8bZQgV_QWPQ33eQK4UkTuZcLBCCLA/exec";
 
 /**
- * 第二張分頁：各列第一欄日幣、第二欄台幣（略過無法辨識為檔位對照的列）
+ * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
+ * 主控台 → Settings → Upload → Upload presets → Add upload preset → Signing mode: Unsigned，
+ * 並在 preset 內設定 Asset folder 或允許 API 傳入 folder（依你的 Cloudinary 設定）。
+ * @example cloudName: "abcd1234"（Dashboard 網址 / 帳戶名稱）
+ * @example uploadPreset: "gacha_unsigned"
+ * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
  */
-function readJpyToTwd_(ss) {
-  var sh = getSheetByIndex_(ss, INDEX_SHEET_RATES);
-  if (!sh) return null;
-  var v = sh.getDataRange().getValues();
-  var o = {};
-  for (var r = 0; r < v.length; r++) {
-    var jpy = v[r][0];
-    var twd = v[r][1];
-    var jn = typeof jpy === "number" ? jpy : parseInt(String(jpy).replace(/,/g, ""), 10);
-    var tn = typeof twd === "number" ? twd : parseFloat(String(twd).replace(/,/g, ""));
-    if (isNaN(jn) || isNaN(tn)) continue;
-    if (jn < 50 || jn > 5000) continue;
-    if (tn < 5) continue;
-    o[String(Math.round(jn))] = Math.round(tn);
-  }
-  return Object.keys(o).length ? o : null;
-}
+window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
+window.GACHA_CLOUDINARY_UPLOAD_PRESET = "wjfvrgv3";
+window.GACHA_CLOUDINARY_FOLDER = "扭蛋管理";
 
-function readHeroBanners_(ss) {
-  var sh = ss.getSheetByName(SHEET_HERO);
-  if (!sh) return null;
-  var v = sh.getDataRange().getValues();
-  if (v.length < 2) return null;
-  var headers = v[0].map(function (h) {
-    return String(h).trim();
-  });
-  var out = [];
-  for (var r = 1; r < v.length; r++) {
-    var row = v[r];
-    var obj = {};
-    for (var c = 0; c < headers.length; c++) {
-      if (headers[c]) obj[headers[c]] = row[c];
-    }
-    var title = obj.title;
-    if (title === "" || title == null) continue;
-    out.push({
-      title: String(obj.title != null ? obj.title : ""),
-      sub: String(obj.sub != null ? obj.sub : ""),
-      gradient: String(obj.gradient != null ? obj.gradient : ""),
-      tag: String(obj.tag != null ? obj.tag : ""),
-    });
-  }
-  return out.length ? out : null;
-}
+/**
+ * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
+ */
+window.GACHA_AUTO_SYNC_SHEET = true;
 
-function readProducts_(ss) {
-  var sh = getSheetByIndex_(ss, INDEX_SHEET_PRODUCTS);
-  if (!sh) return [];
-  var v = sh.getDataRange().getValues();
-  if (v.length < 2) return [];
-  var headers = v[0].map(function (h) {
-    return String(h).trim();
-  });
-  var products = [];
-  for (var r = 1; r < v.length; r++) {
-    var row = v[r];
-    var obj = {};
-    for (var c = 0; c < headers.length; c++) {
-      if (headers[c]) obj[headers[c]] = row[c];
-    }
-    if (!obj.id || String(obj.id).trim() === "") continue;
-    products.push(obj);
-  }
-  return products;
-}
+/**
+ * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
+ * 正式環境請以試算表或 data.js 的 published 為準；若不需本機覆寫，勿開啟後台頁或按後台「清除覆寫」。
+ */
+window.GACHA_PUBLISHED_STORAGE_KEY = "gacha-published-overrides-v1";
 
-function appendProductRow_(product) {
-  var ss = getSpreadsheet_();
-  var sh = getSheetByIndex_(ss, INDEX_SHEET_PRODUCTS);
-  if (!sh) throw new Error("找不到第 1 張分頁（商品）");
-  var v = sh.getDataRange().getValues();
-  var headers = v[0].map(function (h) {
-    return String(h).trim();
-  });
-  var row = headers.map(function (h) {
-    if (!h) return "";
-    var val = product[h];
-    if (val === undefined || val === null) return "";
-    if (typeof val === "object") {
-      try {
-        return JSON.stringify(val);
-      } catch (e) {
-        return String(val);
-      }
-    }
-    return val;
-  });
-  sh.appendRow(row);
-}
+/**
+ * 本機「新增／覆寫商品」的 localStorage 鍵（JSON 陣列，欄位與 GACHA_PRODUCTS 相同）。
+ * 後台「新增商品」會寫入此鍵；首頁載入時會與試算表／data.js 合併（同 id 以本機為準）。
+ */
+window.GACHA_EXTRA_PRODUCTS_KEY = "gacha-products-extra-v1";
+
+/**
+ * 連線扭蛋：日本機台價（日幣／顆）→ 台幣代購參考價（每顆）
+ * 修改對照時僅需改此表，商品上的 jpy 須為下列鍵之一：100、200、300、400、500、600
+ */
+window.GACHA_JPY_TO_TWD = {
+  100: 60,
+  200: 90,
+  300: 130,
+  400: 150,
+  500: 180,
+  600: 200,
+};
+
+/**
+ * 台幣計價（擇一；前台 getProductTwd 會套用）
+ *
+ * 【匯率模式】設為正數時：台幣價 = Math.round(商品 jpy × 匯率)。例：0.22 表示每 1 日幣約 0.22 台幣（可依實際代購／手續費調整）。
+ * 取消註解下一行即啟用；未設定則走下方【檔位表】。
+ */
+// window.GACHA_JPY_TO_TWD_RATE = 0.22;
+
+/**
+ * 【檔位模式】僅在未啟用匯率時使用。可將對照表整體加減價（例 1.05 = 漲 5%）。
+ */
+window.GACHA_TWD_TIER_MULTIPLIER = 1;
+
+/**
+ * 本機 localStorage 鍵：若存一個正數字串，會優先當作匯率（方便不部署就試算；不需要時刪除此鍵）。
+ */
+window.GACHA_JPY_TO_TWD_RATE_STORAGE_KEY = "gacha-jpy-twd-rate-v1";
+
+/**
+ * 商品資料
+ * - jpy：機台價（日幣），須為 GACHA_JPY_TO_TWD 已定義之檔位
+ * - image：主圖網址（可留空，以 accent 漸層示意）
+ * - gallery：詳情彈窗額外圖片（多張網址陣列，可留空）
+ * - description：詳細說明
+ * - specs：尺寸與規格列 { label, value }
+ * - purchaseCount：（選填）購買／登記人次基數，由賣家更新；會與本頁累計加總後顯示
+ * - comingSoon：true 表示待上市（無法加入購物車，僅展示）
+ * - launchNote：（選填）例：預計上架月份、開賣提醒
+ * - labels：（選填）陣列，可填 'new' 新品、'hot' 熱銷、'recommend' 推薦，可並列多個
+ * - published：（選填）false 或「下架」表示前台不顯示、無法加購；預設 true（上架）
+ */
+window.GACHA_PRODUCTS = [
+  {
+    id: "g1",
+    name: "吉伊卡哇 睡衣派對",
+    series: "吉伊卡哇",
+    jpy: 300,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #ffe4ec 0%, #ffc2d4 50%, #ff8fab 100%)",
+    gallery: [
+      "https://picsum.photos/seed/gacha-g1a/800/600",
+      "https://picsum.photos/seed/gacha-g1b/800/600",
+    ],
+    description:
+      "軟萌睡衣造型立體小公仔，適合收藏與拍照。\n連線時可請小幫手確認當日機台與剩餘款式；隨機出貨，下單備註許願會盡力協助。",
+    specs: [
+      { label: "參考尺寸", value: "扭蛋球約 φ50mm；公仔本體約 H45～52mm（依角色略有差異）" },
+      { label: "材質", value: "PVC／ABS（依原廠標示）" },
+      { label: "產地", value: "日本" },
+    ],
+    purchaseCount: 18,
+    labels: ["new", "hot"],
+  },
+  {
+    id: "g2",
+    name: "寶可夢 睡眠系列",
+    series: "寶可夢",
+    jpy: 300,
+    capsule: "全 6 款",
+    image: "",
+    accent: "linear-gradient(145deg, #e0f2fe 0%, #bae6fd 50%, #38bdf8 100%)",
+    gallery: ["https://picsum.photos/seed/gacha-g2a/800/600"],
+    description: "打瞌睡姿勢的寶可夢迷你模型，色彩柔和。隨機款式，連線可現場確認盒況與重複款。",
+    specs: [
+      { label: "參考尺寸", value: "扭蛋球約 φ50mm；內容物約 H40～55mm" },
+      { label: "材質", value: "PVC／軟膠（依款式）" },
+      { label: "產地", value: "日本" },
+    ],
+    purchaseCount: 6,
+    labels: ["hot"],
+  },
+  {
+    id: "g3",
+    name: "咒術迴戰 懷玉·玉折",
+    series: "咒術迴戰",
+    jpy: 400,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #ede9fe 0%, #c4b5fd 50%, #7c3aed 100%)",
+    gallery: [],
+    description: "動畫篇章主題扭蛋，適合搭配小場景展示。實際塗裝與細節以現場實物為準。",
+    specs: [
+      { label: "參考尺寸", value: "約 H50～58mm（角色不同略有差異）" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+    labels: ["recommend"],
+  },
+  {
+    id: "g4",
+    name: "SPY×FAMILY 日常篇",
+    series: "SPY×FAMILY",
+    jpy: 300,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)",
+    gallery: [],
+    description: "佛傑一家的日常小物造型扭蛋，輕巧好收納。隨機出貨，可備註偏好由小幫手留意。",
+    specs: [
+      { label: "參考尺寸", value: "扭蛋球 φ50mm；內容物約 H42～50mm" },
+      { label: "材質", value: "PVC／ABS" },
+      { label: "產地", value: "日本" },
+    ],
+    labels: ["new"],
+  },
+  {
+    id: "g5",
+    name: "鏈鋸人 小小紅與波奇塔",
+    series: "鏈鋸人",
+    jpy: 300,
+    capsule: "全 4 款",
+    image: "",
+    accent: "linear-gradient(145deg, #fee2e2 0%, #fca5a5 50%, #dc2626 100%)",
+    gallery: [],
+    description: "人氣角色迷你收藏系列。每款設計不同，連線時可請小幫手翻攝紙台與實體比例。",
+    specs: [
+      { label: "參考尺寸", value: "約 H48～55mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g6",
+    name: "三麗鷗 星空夜燈",
+    series: "三麗鷗",
+    jpy: 500,
+    capsule: "全 6 款",
+    image: "",
+    accent: "linear-gradient(145deg, #fce7f3 0%, #f9a8d4 50%, #db2777 100%)",
+    gallery: [],
+    description: "可愛角色搭配星空元素的小型夜燈／燈飾系扭蛋（依實際款式為準）。需電池者以包裝說明為主。",
+    specs: [
+      { label: "參考尺寸", value: "約 H55～65mm（依角色）" },
+      { label: "材質", value: "ABS／PVC（依款式）" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g7",
+    name: "排球少年 隊服小立牌",
+    series: "排球少年",
+    jpy: 300,
+    capsule: "全 8 款",
+    image: "",
+    accent: "linear-gradient(145deg, #ffedd5 0%, #fdba74 50%, #ea580c 100%)",
+    gallery: [],
+    description: "迷你立牌尺寸適合書桌展示。多款角色隨機，連線可協助確認是否為新盒或殘盒。",
+    specs: [
+      { label: "參考尺寸", value: "立牌本體約 H50～60mm（含底座）" },
+      { label: "材質", value: "壓克力／紙台（依款式）" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g8",
+    name: "鬼滅之刃 刀鍔收藏",
+    series: "鬼滅之刃",
+    jpy: 400,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #ccfbf1 0%, #5eead4 50%, #0d9488 100%)",
+    gallery: [],
+    description: "刀鍔造型迷你收藏，細節豐富。適合與同系列模型一起展示。",
+    specs: [
+      { label: "參考尺寸", value: "約 φ45～50mm（依款式）" },
+      { label: "材質", value: "PVC／金屬色塗裝（依原廠）" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g9",
+    name: "角落生物 溫泉旅館",
+    series: "角落生物",
+    jpy: 200,
+    capsule: "全 6 款",
+    image: "",
+    accent: "linear-gradient(145deg, #f3e8ff 0%, #d8b4fe 50%, #9333ea 100%)",
+    gallery: [],
+    description: "溫泉主題場景小配件，療癒配色。隨機款式，適合疊放小場景。",
+    specs: [
+      { label: "參考尺寸", value: "約 H35～48mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g10",
+    name: "吉卜力 龍貓 四季",
+    series: "吉卜力",
+    jpy: 500,
+    capsule: "全 4 款",
+    image: "",
+    accent: "linear-gradient(145deg, #ecfccb 0%, #a3e635 50%, #65a30d 100%)",
+    gallery: [],
+    description: "四季氛圍的龍貓小模型，塗裝柔和。正版授權款式以包裝標示為準。",
+    specs: [
+      { label: "參考尺寸", value: "約 H50～62mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g11",
+    name: "假面騎士 迷你腰帶",
+    series: "假面騎士",
+    jpy: 600,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #e5e7eb 0%, #9ca3af 50%, #374151 100%)",
+    gallery: [],
+    description: "可收藏的迷你腰帶造型扭蛋，細節較多。高單價建議連線時確認盒況與重複款。",
+    specs: [
+      { label: "參考尺寸", value: "約 H45～55mm" },
+      { label: "材質", value: "ABS／PVC" },
+      { label: "產地", value: "日本" },
+    ],
+    comingSoon: true,
+    launchNote: "預計 2026/06 日本開賣，開賣後開放連線代購。",
+    labels: ["recommend"],
+  },
+  {
+    id: "g12",
+    name: "蠟筆小新 睡衣小新",
+    series: "蠟筆小新",
+    jpy: 200,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #fef08a 0%, #facc15 50%, #ca8a04 100%)",
+    gallery: [],
+    description: "睡衣造型搞笑pose小公仔，輕鬆可愛。隨機出貨，可備註許願。",
+    specs: [
+      { label: "參考尺寸", value: "約 H45～52mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+    comingSoon: true,
+    launchNote: "官方尚未公佈發售日，上架後會於此頁與 LINE 公告。",
+    labels: ["new"],
+  },
+  {
+    id: "g13",
+    name: "嚕嚕米 北歐小物",
+    series: "嚕嚕米",
+    jpy: 300,
+    capsule: "全 5 款",
+    image: "",
+    accent: "linear-gradient(145deg, #e0f2fe 0%, #bae6fd 55%, #7dd3fc 100%)",
+    gallery: [],
+    description: "北歐風小物扭蛋，清新配色。隨機款式。",
+    specs: [
+      { label: "參考尺寸", value: "約 H40～50mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g14",
+    name: "機動戰士 鋼彈 頭像",
+    series: "鋼彈",
+    jpy: 500,
+    capsule: "全 6 款",
+    image: "",
+    accent: "linear-gradient(145deg, #e8e8e8 0%, #94a3b8 50%, #475569 100%)",
+    gallery: [],
+    description: "經典機體頭像收藏，塗裝細緻。",
+    specs: [
+      { label: "參考尺寸", value: "約 H50～58mm" },
+      { label: "材質", value: "PVC" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+  {
+    id: "g15",
+    name: "貓福珊迪 軟綿公仔",
+    series: "貓福珊迪",
+    jpy: 300,
+    capsule: "全 4 款",
+    image: "",
+    accent: "linear-gradient(145deg, #fef9c3 0%, #fde047 55%, #eab308 100%)",
+    gallery: [],
+    description: "軟萌貓咪造型，適合收藏展示。",
+    specs: [
+      { label: "參考尺寸", value: "約 H42～48mm" },
+      { label: "材質", value: "PVC／植絨（依款式）" },
+      { label: "產地", value: "日本" },
+    ],
+  },
+];
