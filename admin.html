@@ -71,7 +71,7 @@
     <section class="admin-form-card" aria-labelledby="admin-add-title">
       <h2 id="admin-add-title" class="admin-form-card__title">新增商品（本機）</h2>
       <p class="admin-form-card__hint">
-        必填：名稱、系列。編號留空則自動產生。規格為 JSON 陣列，可留空。與試算表同編號時會以本表單覆寫該筆（仍須「儲存設定」才會寫入上下架覆寫）。
+        必填：名稱、系列。編號留空則自動產生。規格為 JSON 陣列，可留空。與試算表同編號時會以本表單覆寫該筆（仍須「儲存設定」才會寫入上下架覆寫）。圖片可用手機<strong>相簿或拍照</strong>上傳，會在瀏覽器內壓縮後存於本機；圖勿過大以免超出儲存上限。
       </p>
       <form id="admin-add-form" class="admin-form" novalidate>
         <div class="admin-form__grid">
@@ -103,17 +103,35 @@
             <input type="text" id="admin-field-capsule" name="capsule" autocomplete="off" placeholder="例：A 款粉" />
           </label>
           <label class="admin-field admin-field--full">
-            <span class="admin-field__label">主圖網址</span>
-            <input type="url" id="admin-field-image" name="image" inputmode="url" placeholder="https://…" />
+            <span class="admin-field__label">主圖（網址或上傳）</span>
+            <textarea id="admin-field-image" name="image" rows="2" spellcheck="false" placeholder="https://… 或下方選圖／拖曳圖片到此"></textarea>
           </label>
+          <div class="admin-field admin-field--full admin-drop" id="admin-drop-main" aria-label="主圖拖曳區">
+            <input type="file" id="admin-file-main" class="visually-hidden" accept="image/*" tabindex="-1" />
+            <div class="admin-upload-row">
+              <button type="button" class="btn ghost admin-btn-upload" id="admin-btn-pick-main">相簿／拍照設為主圖</button>
+              <span class="admin-upload-hint">建議單張 5MB 以下；會自動壓縮</span>
+            </div>
+            <div class="admin-image-preview" id="admin-image-preview" hidden>
+              <img id="admin-image-preview-img" alt="主圖預覽" width="120" height="120" decoding="async" />
+            </div>
+          </div>
           <label class="admin-field admin-field--full">
             <span class="admin-field__label">卡片背景（CSS，可選）</span>
             <textarea id="admin-field-accent" name="accent" rows="2" placeholder="linear-gradient(…)" spellcheck="false"></textarea>
           </label>
           <label class="admin-field admin-field--full">
-            <span class="admin-field__label">其他圖片（以 | 或換行分隔）</span>
-            <textarea id="admin-field-gallery" name="gallery" rows="2" placeholder="https://a.jpg | https://b.jpg"></textarea>
+            <span class="admin-field__label">其他圖片（網址或以 | 分隔，可上傳追加）</span>
+            <textarea id="admin-field-gallery" name="gallery" rows="2" spellcheck="false" placeholder="https://a.jpg | https://b.jpg"></textarea>
           </label>
+          <div class="admin-field admin-field--full">
+            <input type="file" id="admin-file-gallery" class="visually-hidden" accept="image/*" multiple tabindex="-1" />
+            <div class="admin-upload-row">
+              <button type="button" class="btn ghost admin-btn-upload" id="admin-btn-pick-gallery">從相簿加入圖片</button>
+              <span class="admin-upload-hint">可複選；會接在上方內容後（以 | 分隔）</span>
+            </div>
+            <div class="admin-gallery-preview" id="admin-gallery-preview" hidden aria-live="polite"></div>
+          </div>
           <label class="admin-field admin-field--full">
             <span class="admin-field__label">說明</span>
             <textarea id="admin-field-description" name="description" rows="3"></textarea>
