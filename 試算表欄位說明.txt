@@ -1,0 +1,63 @@
+扭蛋連線 · 試算表與公開 JSON 對照
+================================
+
+※ 分頁順序（由左至右）請固定為：
+   第 1 張＝商品、第 2 張＝匯率。
+   第 3 張（選填）名稱請設為 HeroBanners，供首頁輪播；無則用前端 data.js。
+
+
+一、第 1 張分頁 · 商品（必填，第一列為標題列，欄位名稱請與下列完全一致）
+
+欄位名稱          類型     對應 GACHA_PRODUCTS     說明
+----------------------------------------------------------------------
+id                文字     id                     唯一識別，不可空白
+name              文字     name                   商品名稱
+series            文字     series                 系列／IP
+jpy               數字     jpy                    100、200…600 檔位之一
+capsule           文字     capsule                例：全 5 款
+image             文字     image                  主圖完整 URL（Cloudinary 等），可空白
+accent            文字     accent                 無主圖時卡片背景 CSS gradient
+gallery           文字     gallery                多張圖 URL，以 | 分隔；可換行
+description       文字     description            詳細說明
+specs             文字     specs                  JSON 陣列字串，例：
+                                            [{"label":"參考尺寸","value":"約 50mm"}]
+purchaseCount     數字     purchaseCount          購買登記基數，可空白
+comingSoon        布林     comingSoon             TRUE／FALSE
+launchNote        文字     launchNote             待上市說明；可空白
+labels            文字     labels                 逗號分隔：hot,new,recommend
+published         布林     published              TRUE＝上架（前台顯示）；FALSE＝下架（不顯示）；可空白視為上架
+
+
+二、第 2 張分頁 · 匯率（選填）
+
+  【單一匯率】儲存格 B1：填「每 1 日幣合幾元台幣」小數（例 0.22），前台會以「日幣 × 匯率」計台幣。
+             若留白，則不依此單一匯率計價（可改依下方檔位表）。
+
+  【檔位對照】同分頁內各列：第一欄日幣、第二欄台幣參考（例 100 | 60）。
+             可有標題列（文字列會自動略過）；數字列才會寫入 JSON 的 jpyToTwd。
+
+
+三、第 3 張分頁 · HeroBanners（選填，分頁名稱須為 HeroBanners，有則覆寫首頁輪播）
+
+  第一列標題：title | sub | gradient | tag
+  每一列一張 Banner。
+
+
+四、圖片上傳建議流程
+
+  手機拍照 → 上傳至 Cloudinary（後台小工具或官方上傳）→ 複製 HTTPS 網址
+  → 貼到第 1 張分頁的 image 或 gallery 欄位。
+
+  Apps Script 本身不適合直接收大檔 multipart 圖片；以「網址寫入試算表」最穩定。
+
+
+五、前端
+
+  在 data.js 設定 window.GACHA_DATA_URL = '你的 Web App 網址'；
+  留空則僅使用 data.js 內建資料。
+
+
+六、doPost 新增列（選用）
+
+  需設定指令碼屬性 ADMIN_TOKEN；以 POST 送 JSON。
+  若從一般網頁跨網域呼叫可能被瀏覽器擋下，建議用試算表手動列、或 Google 表單、或在本機用 curl 測試。
