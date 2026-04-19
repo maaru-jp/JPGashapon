@@ -36,9 +36,9 @@ window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-a
  * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
  * 主控台 → Settings → Upload → Upload presets → Add upload preset → Signing mode: Unsigned，
  * 並在 preset 內設定 Asset folder 或允許 API 傳入 folder（依你的 Cloudinary 設定）。
- * @example cloudName: "abcd1234"（Dashboard 網址 / 帳戶名稱）
- * @example uploadPreset: "gacha_unsigned"
- * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
+ * @example cloudName: "dtll13zax"（Dashboard 網址 / 帳戶名稱）
+ * @example uploadPreset: "wjfvrgv3"
+ * @example folder: "Gashapon"（選填；與 preset 權限需一致）
  */
 window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
 window.GACHA_CLOUDINARY_UPLOAD_PRESET = "wjfvrgv3";
