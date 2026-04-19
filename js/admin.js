@@ -411,16 +411,6 @@
     const accent = (document.getElementById("admin-field-accent")?.value || "").trim();
     const gallery = (document.getElementById("admin-field-gallery")?.value || "").trim();
     const description = (document.getElementById("admin-field-description")?.value || "").trim();
-    const specsRaw = (document.getElementById("admin-field-specs")?.value || "").trim();
-    let specs = [];
-    if (specsRaw) {
-      try {
-        const parsed = JSON.parse(specsRaw);
-        specs = Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return { id, name, series, error: "規格須為有效的 JSON 陣列。" };
-      }
-    }
 
     const pcEl = document.getElementById("admin-field-purchaseCount");
     const pcRaw = pcEl && "value" in pcEl ? String(pcEl.value || "").trim() : "";
@@ -446,7 +436,6 @@
       accent,
       gallery: gallery || "",
       description,
-      specs,
       purchaseCount,
       launchNote,
       labels,
