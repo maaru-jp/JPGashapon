@@ -30,7 +30,7 @@ window.HERO_BANNERS = [
  * @example "https://script.google.com/macros/s/XXXX/exec"
  * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-abxnqY74f9DZKVlZNXPvEQAcX8iXls8m1isTD5_VLce0k6JPdD9ievg/exec
+window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-abxnqY74f9DZKVlZNXPvEQAcX8iXls8m1isTD5_VLce0k6JPdD9ievg/exec"
 ";
 
 /**
