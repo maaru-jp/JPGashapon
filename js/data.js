@@ -40,7 +40,7 @@ window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0
  * @example uploadPreset: "gacha_unsigned"
  * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
  */
-window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
+window.GACHA_CLOUDINARY_CLOUD_NAME = "491e7edae6dd1f07efb907fed72a9d";
 window.GACHA_CLOUDINARY_UPLOAD_PRESET = "icn59m22";
 window.GACHA_CLOUDINARY_FOLDER = "";
 
