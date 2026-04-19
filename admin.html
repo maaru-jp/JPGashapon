@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>後台管理｜扭蛋連線</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="admin-body">
+  <a class="admin-skip" href="#admin-main">略過導覽至主要內容</a>
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <header class="admin-header">
+    <div class="admin-header__inner">
+      <a class="admin-brand" href="index.html">
+        <span class="admin-brand__icon" aria-hidden="true">🎰</span>
+        <span>扭蛋連線 · 後台管理</span>
+      </a>
+      <div class="admin-header__actions">
+        <span class="admin-badge" id="admin-data-source" title="商品資料來源">載入中…</span>
+        <button type="button" class="btn ghost" id="admin-reload">重新載入資料</button>
+        <a class="btn primary" href="index.html">前往首頁</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main" id="admin-main">
+    <section class="admin-hero" aria-labelledby="admin-title">
+      <p class="admin-hero__eyebrow">SELLER CONSOLE</p>
+      <h1 id="admin-title">後台管理</h1>
+      <p>每筆商品以<strong>橫向滑動開關</strong>切換：<strong>綠色（右開）</strong>為上架，顧客會在首頁看到商品卡；<strong>灰色（左關）</strong>為下架，顧客看不到、也無法加購。下方可<strong>新增商品（本機）</strong>，欄位與 <code>data.js</code> 的 <code>GACHA_PRODUCTS</code> 一致。上下架狀態可儲存為<strong>本機覆寫</strong>；正式營運請同步更新試算表或 JSON。</p>
+    </section>
+
+    <section class="admin-stats" aria-label="上架統計">
+      <div class="admin-stat admin-stat--accent">
+        <p class="admin-stat__val" id="stat-on">0</p>
+        <p class="admin-stat__label">上架中</p>
+      </div>
+      <div class="admin-stat">
+        <p class="admin-stat__val" id="stat-off">0</p>
+        <p class="admin-stat__label">下架中</p>
+      </div>
+      <div class="admin-stat">
+        <p class="admin-stat__val" id="stat-total">0</p>
+        <p class="admin-stat__label">總筆數</p>
+      </div>
+    </section>
+
+    <div class="admin-panels">
+      <section class="admin-panel" aria-labelledby="panel-src">
+        <h2 id="panel-src">資料與覆寫</h2>
+        <p>
+          商品清單來自 <code>data.js</code> 的 <code>GACHA_PRODUCTS</code>，若設定了 <code>GACHA_DATA_URL</code> 則優先使用遠端 JSON。
+          「儲存設定」寫入上架覆寫（鍵：<code id="admin-key-hint"></code>）。本機新增／覆寫的商品存於（鍵：<code id="admin-extra-key-hint"></code>），同編號時<strong>覆寫</strong>雲端／本檔條目。
+        </p>
+      </section>
+      <section class="admin-panel" aria-labelledby="panel-how">
+        <h2 id="panel-how">操作方式</h2>
+        <p>
+          以<strong>滑動開關</strong>切換上下架（<strong>綠色</strong>＝上架，<strong>灰色</strong>＝下架）。可用搜尋縮小列表；批次可一鍵全部上架或全部下架（仍須按「儲存設定」才會寫入本機）。
+          若要改回只跟隨雲端或 <code>data.js</code> 的上下架，請按「清除本機覆寫」。若要刪除本機新增的商品條目，請在列表「本機」欄按「移除」，或按「清除本機新增商品」。
+        </p>
+      </section>
+    </div>
+
+    <section class="admin-form-card" aria-labelledby="admin-add-title">
+      <h2 id="admin-add-title" class="admin-form-card__title">新增商品（本機）</h2>
+      <p class="admin-form-card__hint">
+        必填：名稱、系列。編號留空則自動產生。規格為 JSON 陣列，可留空。與試算表同編號時會以本表單覆寫該筆（仍須「儲存設定」才會寫入上下架覆寫）。
+      </p>
+      <form id="admin-add-form" class="admin-form" novalidate>
+        <div class="admin-form__grid">
+          <label class="admin-field">
+            <span class="admin-field__label">商品編號</span>
+            <input type="text" id="admin-field-id" name="id" autocomplete="off" placeholder="留空則自動（例如 new-1730…）" />
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">名稱 <abbr title="必填">*</abbr></span>
+            <input type="text" id="admin-field-name" name="name" required autocomplete="off" />
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">系列 <abbr title="必填">*</abbr></span>
+            <input type="text" id="admin-field-series" name="series" required autocomplete="off" />
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">機台價（日幣／顆）</span>
+            <select id="admin-field-jpy" name="jpy">
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="300" selected>300</option>
+              <option value="400">400</option>
+              <option value="500">500</option>
+              <option value="600">600</option>
+            </select>
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">款式／顏色</span>
+            <input type="text" id="admin-field-capsule" name="capsule" autocomplete="off" placeholder="例：A 款粉" />
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">主圖網址</span>
+            <input type="url" id="admin-field-image" name="image" inputmode="url" placeholder="https://…" />
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">卡片背景（CSS，可選）</span>
+            <textarea id="admin-field-accent" name="accent" rows="2" placeholder="linear-gradient(…)" spellcheck="false"></textarea>
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">其他圖片（以 | 或換行分隔）</span>
+            <textarea id="admin-field-gallery" name="gallery" rows="2" placeholder="https://a.jpg | https://b.jpg"></textarea>
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">說明</span>
+            <textarea id="admin-field-description" name="description" rows="3"></textarea>
+          </label>
+          <label class="admin-field admin-field--full">
+            <span class="admin-field__label">規格（JSON 陣列）</span>
+            <textarea id="admin-field-specs" name="specs" rows="2" spellcheck="false" placeholder='[{"k":"尺寸","v":"約 5cm"}]'></textarea>
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">已購人次（可選）</span>
+            <input type="number" id="admin-field-purchaseCount" name="purchaseCount" min="0" step="1" placeholder="例：12" />
+          </label>
+          <label class="admin-field">
+            <span class="admin-field__label">上市說明</span>
+            <input type="text" id="admin-field-launchNote" name="launchNote" placeholder="例：預計下週到貨" />
+          </label>
+        </div>
+        <fieldset class="admin-form__fieldset">
+          <legend class="admin-form__legend">標籤</legend>
+          <label class="admin-check"><input type="checkbox" id="admin-label-new" name="labelNew" /> NEW</label>
+          <label class="admin-check"><input type="checkbox" id="admin-label-hot" name="labelHot" /> HOT</label>
+          <label class="admin-check"><input type="checkbox" id="admin-label-recommend" name="labelRecommend" /> 推薦</label>
+        </fieldset>
+        <fieldset class="admin-form__fieldset">
+          <legend class="admin-form__legend">狀態</legend>
+          <label class="admin-check"><input type="checkbox" id="admin-field-comingSoon" name="comingSoon" /> 待上市</label>
+          <label class="admin-check"><input type="checkbox" id="admin-field-published" name="published" checked /> 預設上架（資料欄 published）</label>
+        </fieldset>
+        <div class="admin-form__actions">
+          <button type="submit" class="btn primary" id="admin-add-submit">加入商品</button>
+          <button type="reset" class="btn ghost" id="admin-add-reset">重設表單</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-toolbar" aria-label="工具列">
+      <div class="admin-toolbar__row">
+        <div class="admin-search">
+          <label for="admin-search" class="visually-hidden">搜尋商品</label>
+          <input type="search" id="admin-search" placeholder="搜尋編號、名稱、系列…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="admin-toolbar__row">
+        <button type="button" class="btn ghost" id="admin-bulk-on">全部上架</button>
+        <button type="button" class="btn ghost" id="admin-bulk-off">全部下架</button>
+        <span class="admin-toolbar__spacer" aria-hidden="true"></span>
+        <button type="button" class="btn primary" id="admin-save">儲存設定</button>
+        <button type="button" class="btn ghost" id="admin-clear">清除本機覆寫</button>
+        <button type="button" class="btn ghost" id="admin-clear-extras">清除本機新增商品</button>
+      </div>
+    </section>
+
+    <section class="admin-table-card" aria-labelledby="admin-table-title">
+      <h2 id="admin-table-title" class="visually-hidden">商品列表</h2>
+      <div id="admin-table-host">
+        <p class="admin-loading" id="admin-loading">正在載入商品…</p>
+      </div>
+    </section>
+
+    <p class="admin-footer-note">
+      此頁不驗證帳號密碼，請勿公開網址；正式環境建議限制 IP、Basic Auth 或僅在本機開啟。清除瀏覽器資料會一併刪除本機上架覆寫與本機新增商品。
+    </p>
+    <div id="admin-feedback" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

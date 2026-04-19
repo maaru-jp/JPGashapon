@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>東京扭蛋連線｜代購展示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🎰</span>
+      <div class="brand-text">
+        <h1>東京扭蛋連線</h1>
+        <p class="tagline">即時代購展示 · 選好後複製貼上到官方 LINE 下單</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn ghost" id="btn-howto" aria-expanded="false" aria-controls="howto-panel">
+        使用說明
+      </button>
+      <button type="button" class="btn cart-toggle" id="btn-cart" aria-expanded="false" aria-controls="cart-panel">
+        <span class="cart-icon" aria-hidden="true">🛒</span>
+        購物車
+        <span class="badge" id="cart-count" hidden>0</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="howto" id="howto-panel" hidden>
+    <ol>
+      <li>瀏覽扭蛋卡並點開詳情；「待上市」僅預覽，可連線選購款可點「加入購物車」。</li>
+      <li>右上角開啟購物車，確認數量與備註。</li>
+      <li>點「複製訂單文字」，貼到官方 LINE 對話框送出即可。</li>
+    </ol>
+    <div class="howto-callout howto-callout--shipping" role="note" aria-label="出貨說明">
+      <span class="howto-callout__icon" aria-hidden="true">📦</span>
+      <div class="howto-callout__body">
+        <strong class="howto-callout__title">出貨說明</strong>
+        <p class="howto-callout__text">
+          本次東京連線為獨立出貨訂單，恕不與其他預購商品合併寄送。將於連線結束後統一整理並依序出貨，敬請理解。
+        </p>
+      </div>
+    </div>
+    <div class="howto-callout" role="note" aria-label="扭蛋外殼說明">
+      <span class="howto-callout__icon" aria-hidden="true">🥚</span>
+      <div class="howto-callout__body">
+        <strong class="howto-callout__title">扭蛋外殼說明</strong>
+        <p class="howto-callout__text">扭蛋外殼均會保留；外殼若本身稍微受損不屬於瑕疵品。</p>
+      </div>
+    </div>
+    <p class="howto-seller">
+      <span class="howto-seller__label">店家／管理</span>
+      <a href="admin.html" class="howto-seller__link">開啟後台管理</a>
+      <span class="howto-seller__hint">（亦可在頁尾找到連結）</span>
+    </p>
+  </div>
+
+  <section class="hero-carousel" aria-roledescription="輪播" aria-label="主打活動">
+    <div class="hero-inner">
+      <div class="hero-viewport" id="hero-viewport">
+        <div class="hero-track" id="hero-track" role="list"></div>
+      </div>
+      <button type="button" class="hero-nav hero-prev" id="hero-prev" aria-label="上一張">
+        <span aria-hidden="true">‹</span>
+      </button>
+      <button type="button" class="hero-nav hero-next" id="hero-next" aria-label="下一張">
+        <span aria-hidden="true">›</span>
+      </button>
+      <div class="hero-dots" id="hero-dots" role="tablist" aria-label="選擇輪播頁"></div>
+    </div>
+  </section>
+
+  <section class="order-flow" aria-labelledby="order-flow-title">
+    <div class="order-flow__inner">
+      <header class="order-flow__head">
+        <p class="order-flow__eyebrow">HOW TO ORDER</p>
+        <div class="order-flow__title-row">
+          <span class="order-flow__bar" aria-hidden="true"></span>
+          <h2 id="order-flow-title" class="order-flow__title">代購流程說明</h2>
+        </div>
+      </header>
+      <ol class="order-flow__steps">
+        <li class="order-flow__step" style="--step-color: #e11d2e">
+          <div class="order-flow__node" aria-hidden="true">
+            <span class="order-flow__num">01</span>
+            <svg class="order-flow__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <path d="M9 22V12h6v10" />
+            </svg>
+          </div>
+          <div class="order-flow__body">
+            <h3 class="order-flow__step-title">瀏覽商品</h3>
+            <p class="order-flow__step-desc">在本頁瀏覽扭蛋商品，挑選喜歡的款式，並確認價格與系列資訊。</p>
+          </div>
+        </li>
+        <li class="order-flow__step" style="--step-color: #f58220">
+          <div class="order-flow__node" aria-hidden="true">
+            <span class="order-flow__num">02</span>
+            <svg class="order-flow__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 8v8M8 12h8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="order-flow__body">
+            <h3 class="order-flow__step-title">加入購物車</h3>
+            <p class="order-flow__step-desc">點「加入購物車」，再從購物車「複製訂單文字」貼到官方 LINE，一鍵帶入內容。</p>
+          </div>
+        </li>
+        <li class="order-flow__step" style="--step-color: #00c300">
+          <div class="order-flow__node" aria-hidden="true">
+            <span class="order-flow__num">03</span>
+            <svg class="order-flow__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8.5z" />
+            </svg>
+          </div>
+          <div class="order-flow__body">
+            <h3 class="order-flow__step-title">傳送 LINE 訊息</h3>
+            <p class="order-flow__step-desc">確認訊息內容、填寫數量後，傳送至我們的官方帳號。</p>
+          </div>
+        </li>
+        <li class="order-flow__step" style="--step-color: #8a5cf5">
+          <div class="order-flow__node" aria-hidden="true">
+            <span class="order-flow__num">04</span>
+            <svg class="order-flow__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <path d="M2 10h20" />
+            </svg>
+          </div>
+          <div class="order-flow__body">
+            <h3 class="order-flow__step-title">確認付款</h3>
+            <p class="order-flow__step-desc">小幫手回覆確認訂單並提供付訂方式，完成後訂單成立。</p>
+          </div>
+        </li>
+        <li class="order-flow__step" style="--step-color: #009fe3">
+          <div class="order-flow__node" aria-hidden="true">
+            <span class="order-flow__num">05</span>
+            <svg class="order-flow__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+            </svg>
+          </div>
+          <div class="order-flow__body">
+            <h3 class="order-flow__step-title">東京出貨</h3>
+            <p class="order-flow__step-desc">本月東京連線結束後回台後寄出。</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <main class="catalog-main">
+    <section class="catalog-head">
+      <p class="catalog-head__eyebrow">PRODUCTS</p>
+      <div class="catalog-head__title-row">
+        <span class="catalog-head__bar" aria-hidden="true"></span>
+        <h2 class="catalog-head__title">商品一覽</h2>
+      </div>
+      <p class="catalog-head__desc">
+        點選系列或搜尋；「待上市」可先預覽圖文，開賣後再開放加入購物車。點商品卡可看詳情。
+      </p>
+      <div class="spotlight-filters" id="spotlight-filters" role="group" aria-label="標籤篩選"></div>
+    </section>
+
+    <section class="toolbar" aria-label="篩選">
+      <div class="search-wrap">
+        <label for="search" class="visually-hidden">搜尋商品</label>
+        <input type="search" id="search" class="search-input" placeholder="搜尋系列、角色或關鍵字…" autocomplete="off" />
+      </div>
+      <p class="toolbar-label">機台價（日幣檔位）</p>
+      <div class="filters filters--price" id="price-filters" role="group" aria-label="機台價（日幣檔位）"></div>
+      <p class="toolbar-label">系列</p>
+      <div class="filters" id="series-filters"></div>
+    </section>
+
+    <section class="products" id="products-section" aria-label="扭蛋商品">
+      <div class="products-frame">
+        <div class="products-grid" id="products-grid"></div>
+        <nav class="products-pagination" id="products-pagination" aria-label="商品分頁" hidden></nav>
+      </div>
+    </section>
+  </main>
+
+  <div class="product-modal" id="product-modal" hidden>
+    <div class="product-modal-backdrop" id="product-modal-backdrop" tabindex="-1"></div>
+    <div
+      class="product-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="product-modal-title"
+      id="product-modal-dialog"
+    >
+      <button type="button" class="product-modal-close btn icon-only" id="product-modal-close" aria-label="關閉詳情">
+        ✕
+      </button>
+      <div class="product-modal-layout">
+        <div class="product-modal-gallery-col">
+          <div class="product-modal-figure" id="product-modal-figure" aria-live="polite"></div>
+          <div class="product-modal-thumbs-wrap" id="product-modal-thumbs-wrap" hidden>
+            <div class="product-modal-thumbs" id="product-modal-thumbs" role="tablist" aria-label="商品圖片"></div>
+          </div>
+        </div>
+        <div class="product-modal-info">
+          <p class="product-modal-series" id="product-modal-series"></p>
+          <div class="product-modal-labels" id="product-modal-labels" hidden></div>
+          <h2 id="product-modal-title" class="product-modal-title"></h2>
+          <p class="product-modal-price" id="product-modal-price"></p>
+          <p class="product-modal-soon" id="product-modal-soon" hidden></p>
+          <p class="product-modal-capsule" id="product-modal-capsule"></p>
+          <p class="product-modal-purchase" id="product-modal-purchase" hidden></p>
+          <div class="product-modal-desc" id="product-modal-desc"></div>
+          <h3 class="product-modal-specs-heading">尺寸與規格</h3>
+          <table class="product-modal-specs" id="product-modal-specs">
+            <tbody></tbody>
+          </table>
+          <div class="product-modal-actions">
+            <button type="button" class="btn primary" id="product-modal-add">加入購物車</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="cart-panel" id="cart-panel" hidden aria-label="購物車">
+    <div class="cart-backdrop" id="cart-backdrop" tabindex="-1"></div>
+    <div class="cart-sheet" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-head">
+        <h2 id="cart-title">購物車</h2>
+        <button type="button" class="btn icon-only" id="btn-close-cart" aria-label="關閉購物車">✕</button>
+      </div>
+      <div class="cart-body">
+        <ul class="cart-list" id="cart-list"></ul>
+        <p class="cart-empty" id="cart-empty">尚無商品，先去挑幾顆扭蛋吧！</p>
+      </div>
+      <div class="cart-foot">
+        <label for="note" class="note-label">備註（選填）</label>
+        <textarea id="note" class="note-input" rows="2" placeholder="例如：顏色偏好、取貨方式、暱稱…"></textarea>
+        <div class="cart-summary">
+          <span>小計</span>
+          <strong id="cart-subtotal">NT$ 0</strong>
+        </div>
+        <button type="button" class="btn primary block" id="btn-copy">
+          複製訂單文字（貼到 LINE）
+        </button>
+        <p class="copy-hint" id="copy-feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </aside>
+
+  <footer class="site-footer">
+    <p>展示頁僅供連線選購參考，實際金額與庫存以官方 LINE 回覆為準。</p>
+    <p class="site-footer__meta">
+      <a href="admin.html" class="site-footer__admin">後台管理</a>
+    </p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

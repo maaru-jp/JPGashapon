@@ -1,0 +1,37 @@
+{
+  "jpyToTwd": {
+    "100": 60,
+    "200": 90,
+    "300": 130,
+    "400": 150,
+    "500": 180,
+    "600": 200
+  },
+  "heroBanners": [
+    {
+      "title": "東京連線｜扭蛋新鮮貨",
+      "sub": "本週連線限定 · 即時更新庫存",
+      "gradient": "linear-gradient(118deg, #fff5f7 0%, #fce7f3 35%, #fbcfe8 70%, #fda4af 100%)",
+      "tag": "NEW"
+    }
+  ],
+  "products": [
+    {
+      "id": "demo-1",
+      "name": "範例商品",
+      "series": "範例系列",
+      "jpy": 300,
+      "capsule": "全 5 款",
+      "image": "",
+      "accent": "linear-gradient(145deg, #ffe4ec 0%, #ffc2d4 50%, #ff8fab 100%)",
+      "gallery": "",
+      "description": "此為 sample-gacha-data.json 範例。gallery 可用 | 分隔多張網址。",
+      "specs": "[{\"label\":\"參考尺寸\",\"value\":\"約 50mm\"}]",
+      "purchaseCount": 0,
+      "comingSoon": false,
+      "published": true,
+      "launchNote": "",
+      "labels": "new"
+    }
+  ]
+}
