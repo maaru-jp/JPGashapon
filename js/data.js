@@ -30,7 +30,7 @@ window.HERO_BANNERS = [
  * @example "https://script.google.com/macros/s/XXXX/exec"
  * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0I3niJfoAzm90ASuD4W2SVWnHS8bZQgV_QWPQ33eQK4UkTuZcLBCCLA/exec";
+window.GACHA_DATA_URL = "";
 
 /**
  * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
@@ -40,14 +40,14 @@ window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbzGTLKhzGEWHLc0
  * @example uploadPreset: "gacha_unsigned"
  * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
  */
-window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
-window.GACHA_CLOUDINARY_UPLOAD_PRESET = "icn59m22";
+window.GACHA_CLOUDINARY_CLOUD_NAME = "";
+window.GACHA_CLOUDINARY_UPLOAD_PRESET = "";
 window.GACHA_CLOUDINARY_FOLDER = "";
 
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
  */
-window.GACHA_AUTO_SYNC_SHEET = true;
+window.GACHA_AUTO_SYNC_SHEET = false;
 
 /**
  * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
@@ -105,7 +105,7 @@ window.GACHA_JPY_TO_TWD_RATE_STORAGE_KEY = "gacha-jpy-twd-rate-v1";
  * - labels：（選填）陣列，可填 'new' 新品、'hot' 熱銷、'recommend' 推薦，可並列多個
  * - published：（選填）false 或「下架」表示前台不顯示、無法加購；預設 true（上架）
  */
-window.GACHA_PRODUCTS = [
+window.GACHA_PRODUCTS = []; /*
   {
     id: "g1",
     name: "吉伊卡哇 睡衣派對",
@@ -362,4 +362,4 @@ window.GACHA_PRODUCTS = [
       { label: "產地", value: "日本" },
     ],
   },
-];
+*/
