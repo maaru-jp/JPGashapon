@@ -30,8 +30,7 @@ window.HERO_BANNERS = [
  * @example "https://script.google.com/macros/s/XXXX/exec"
  * 後台勾選「同步寫入試算表」時，亦用此網址以 POST 新增列（需指令碼屬性 ADMIN_TOKEN）。
  */
-window.GACHA_DATA_URL = "
-https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-abxnqY74f9DZKVlZNXPvEQAcX8iXls8m1isTD5_VLce0k6JPdD9ievg/exec";
+window.GACHA_DATA_URL = "https://script.google.com/macros/s/AKfycbwiOGPJxoSyc6-abxnqY74f9DZKVlZNXPvEQAcX8iXls8m1isTD5_VLce0k6JPdD9ievg/exec";
 
 /**
  * Cloudinary：後台選圖時改為上傳雲端並寫入圖片網址（需 Unsigned upload preset）。
@@ -48,7 +47,7 @@ window.GACHA_CLOUDINARY_FOLDER = "扭蛋管理";
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
  */
-window.GACHA_AUTO_SYNC_SHEET = false;
+window.GACHA_AUTO_SYNC_SHEET = true;
 
 /**
  * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
