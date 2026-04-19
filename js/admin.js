@@ -87,6 +87,120 @@
     return list.filter((p) => p && String(p.id || "").trim());
   }
 
+  const MAX_IMAGE_SIDE = 1600;
+
+  /**
+   * 將圖片檔壓縮為 JPEG Data URL（供本機商品欄位儲存）
+   * @param {File} file
+   * @returns {Promise<string>}
+   */
+  function compressImageFileToDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+        reject(new Error("請選擇圖片檔（JPG／PNG 等）"));
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        var url = reader.result;
+        var img = new Image();
+        img.onload = function () {
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          if (!w || !h) {
+            reject(new Error("無法讀取圖片尺寸"));
+            return;
+          }
+          var max = MAX_IMAGE_SIDE;
+          if (w > max || h > max) {
+            var r = Math.min(max / w, max / h);
+            w = Math.round(w * r);
+            h = Math.round(h * r);
+          }
+          var canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("無法處理圖片"));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, w, h);
+          var q = 0.85;
+          var dataUrl = canvas.toDataURL("image/jpeg", q);
+          while (dataUrl.length > 2000000 && q > 0.42) {
+            q -= 0.07;
+            dataUrl = canvas.toDataURL("image/jpeg", q);
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = function () {
+          reject(new Error("圖片無法顯示（若為 iPhone HEIC，請在相簿改選 JPG 或截圖）"));
+        };
+        img.src = url;
+      };
+      reader.onerror = function () {
+        reject(new Error("讀取檔案失敗"));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setMainImagePreview(src) {
+    var wrap = document.getElementById("admin-image-preview");
+    var im = document.getElementById("admin-image-preview-img");
+    if (!wrap || !im) return;
+    var s = src && String(src).trim();
+    if (s && (s.indexOf("http") === 0 || s.indexOf("data:image") === 0)) {
+      im.src = s;
+      wrap.hidden = false;
+    } else {
+      im.removeAttribute("src");
+      wrap.hidden = true;
+    }
+  }
+
+  function refreshGalleryPreview() {
+    var ta = document.getElementById("admin-field-gallery");
+    var host = document.getElementById("admin-gallery-preview");
+    if (!ta || !host) return;
+    var parts = String(ta.value || "")
+      .split(/[|\n\r]+/)
+      .map(function (s) {
+        return s.trim();
+      })
+      .filter(Boolean);
+    host.innerHTML = "";
+    if (!parts.length) {
+      host.hidden = true;
+      return;
+    }
+    host.hidden = false;
+    parts.slice(0, 12).forEach(function (src) {
+      var img = document.createElement("img");
+      img.src = src;
+      img.alt = "";
+      img.width = 56;
+      img.height = 56;
+      img.loading = "lazy";
+      img.className = "admin-gallery-thumb";
+      host.appendChild(img);
+    });
+  }
+
+  function clearUploadUI() {
+    var mainFile = document.getElementById("admin-file-main");
+    var galFile = document.getElementById("admin-file-gallery");
+    if (mainFile instanceof HTMLInputElement) mainFile.value = "";
+    if (galFile instanceof HTMLInputElement) galFile.value = "";
+    setMainImagePreview("");
+    var gh = document.getElementById("admin-gallery-preview");
+    if (gh) {
+      gh.innerHTML = "";
+      gh.hidden = true;
+    }
+  }
+
   function escapeHtml(s) {
     const div = document.createElement("div");
     div.textContent = s;
@@ -359,6 +473,96 @@
   document.addEventListener("DOMContentLoaded", () => {
     void bootstrap();
 
+    document.getElementById("admin-btn-pick-main")?.addEventListener("click", () => {
+      document.getElementById("admin-file-main")?.click();
+    });
+    document.getElementById("admin-file-main")?.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLInputElement) || !t.files || !t.files[0]) return;
+      const file = t.files[0];
+      t.value = "";
+      compressImageFileToDataUrl(file)
+        .then((dataUrl) => {
+          const ta = document.getElementById("admin-field-image");
+          if (ta instanceof HTMLTextAreaElement) ta.value = dataUrl;
+          setMainImagePreview(dataUrl);
+          setFeedback("已設為主圖（已壓縮）。", "ok");
+        })
+        .catch((err) => setFeedback(String(err.message || err), "err"));
+    });
+
+    document.getElementById("admin-btn-pick-gallery")?.addEventListener("click", () => {
+      document.getElementById("admin-file-gallery")?.click();
+    });
+    document.getElementById("admin-file-gallery")?.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLInputElement) || !t.files || !t.files.length) return;
+      const files = Array.from(t.files);
+      t.value = "";
+      const ta = document.getElementById("admin-field-gallery");
+      if (!(ta instanceof HTMLTextAreaElement)) return;
+      let chain = Promise.resolve();
+      files.forEach((file) => {
+        chain = chain.then(() =>
+          compressImageFileToDataUrl(file).then((dataUrl) => {
+            const cur = ta.value.trim();
+            ta.value = cur ? cur + " | " + dataUrl : dataUrl;
+            refreshGalleryPreview();
+          })
+        );
+      });
+      chain
+        .then(() => setFeedback("已加入 " + files.length + " 張圖片。", "ok"))
+        .catch((err) => setFeedback(String(err.message || err), "err"));
+    });
+
+    const dropMain = document.getElementById("admin-drop-main");
+    if (dropMain) {
+      ["dragenter", "dragover"].forEach((ev) => {
+        dropMain.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropMain.classList.add("admin-drop--active");
+        });
+      });
+      dropMain.addEventListener("dragleave", () => {
+        dropMain.classList.remove("admin-drop--active");
+      });
+      dropMain.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropMain.classList.remove("admin-drop--active");
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!f || f.type.indexOf("image/") !== 0) {
+          setFeedback("請拖入圖片檔。", "err");
+          return;
+        }
+        compressImageFileToDataUrl(f)
+          .then((dataUrl) => {
+            const ta = document.getElementById("admin-field-image");
+            if (ta instanceof HTMLTextAreaElement) ta.value = dataUrl;
+            setMainImagePreview(dataUrl);
+            setFeedback("已設為主圖（拖曳上傳）。", "ok");
+          })
+          .catch((err) => setFeedback(String(err.message || err), "err"));
+      });
+    }
+
+    document.getElementById("admin-field-image")?.addEventListener("input", () => {
+      const ta = document.getElementById("admin-field-image");
+      if (ta instanceof HTMLTextAreaElement) setMainImagePreview(ta.value);
+    });
+    document.getElementById("admin-field-gallery")?.addEventListener("input", () => {
+      refreshGalleryPreview();
+    });
+
+    document.getElementById("admin-add-reset")?.addEventListener("click", () => {
+      clearUploadUI();
+    });
+    document.getElementById("admin-add-form")?.addEventListener("reset", () => {
+      setTimeout(clearUploadUI, 0);
+    });
+
     document.getElementById("admin-reload")?.addEventListener("click", async () => {
       setFeedback("正在重新載入…", "");
       await bootstrap();
@@ -445,12 +649,18 @@
       try {
         saveExtraProducts(list);
       } catch (err) {
-        setFeedback("儲存失敗：" + String(err), "err");
+        const name = err && /** @type {Error} */ (err).name;
+        if (name === "QuotaExceededError" || String(err).indexOf("QuotaExceeded") !== -1) {
+          setFeedback("儲存失敗：本機空間不足（圖太大或太多）。請刪減圖片、改用圖床網址，或清除部分本機商品。", "err");
+        } else {
+          setFeedback("儲存失敗：" + String(err), "err");
+        }
         return;
       }
       setFeedback("已加入本機商品「" + String(row.name) + "」。請重新整理首頁查看。", "ok");
       const form = document.getElementById("admin-add-form");
       if (form instanceof HTMLFormElement) form.reset();
+      clearUploadUI();
       const jpyEl = document.getElementById("admin-field-jpy");
       if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
       const pubEl = document.getElementById("admin-field-published");
