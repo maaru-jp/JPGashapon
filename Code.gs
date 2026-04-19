@@ -55,7 +55,7 @@ function readJpyToTwdRate_(ss) {
  */
 function doPost(e) {
   var props = PropertiesService.getScriptProperties();
-  var expect = props.getProperty("ADMIN_TOKEN");
+  var expect = props.getProperty("acha_2026!Seller#A9");
   if (!expect) {
     return jsonResponse_({ ok: false, error: "未設定 ADMIN_TOKEN" });
   }
@@ -78,7 +78,7 @@ function doPost(e) {
 }
 
 function getSpreadsheet_() {
-  var id = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID") || FALLBACK_SPREADSHEET_ID;
+  var id = PropertiesService.getScriptProperties().getProperty("1YxkOHB23w4A9yPRvFQw3c2fctRjrHBLrPIqmUiQRJ5g") || FALLBACK_SPREADSHEET_ID;
   if (!id) throw new Error("請在指令碼屬性設定 SPREADSHEET_ID");
   return SpreadsheetApp.openById(id);
 }
