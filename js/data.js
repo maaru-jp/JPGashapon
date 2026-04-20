@@ -41,9 +41,9 @@ window.GACHA_DATA_URL =
  * @example uploadPreset: "gacha_unsigned"
  * @example folder: "扭蛋連線/2025" 或 "gacha/products"（選填；與 preset 權限需一致）
  */
-window.GACHA_CLOUDINARY_CLOUD_NAME = "dtll13zax";
-window.GACHA_CLOUDINARY_UPLOAD_PRESET = "wjfvrgv3";
-window.GACHA_CLOUDINARY_FOLDER = "Gashapon";
+window.GACHA_CLOUDINARY_CLOUD_NAME = "";
+window.GACHA_CLOUDINARY_UPLOAD_PRESET = "";
+window.GACHA_CLOUDINARY_FOLDER = "";
 
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。

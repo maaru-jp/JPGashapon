@@ -524,7 +524,7 @@
     return [
       {
         label: "參考尺寸",
-        value: `扭蛋球約 φ50mm；內容物尺寸依款式不同（${p.capsule || "多款"}）`,
+        value: "內容物尺寸因款式不同略有差異，實際規格請以原廠為準。",
       },
       { label: "材質", value: "PVC／ABS 等（依原廠標示）" },
       { label: "產地", value: "日本" },
