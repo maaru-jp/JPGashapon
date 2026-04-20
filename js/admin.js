@@ -5,6 +5,36 @@
   const EXTRA_KEY = window.GACHA_EXTRA_PRODUCTS_KEY || "gacha-products-extra-v1";
   const SHEET_TOKEN_KEY = "gacha-admin-sheet-token-v1";
 
+  function getStoredSheetToken() {
+    try {
+      const v = localStorage.getItem(SHEET_TOKEN_KEY);
+      if (v != null) return String(v);
+    } catch {
+      /* ignore */
+    }
+    try {
+      const v = sessionStorage.getItem(SHEET_TOKEN_KEY);
+      if (v != null) return String(v);
+    } catch {
+      /* ignore */
+    }
+    return "";
+  }
+
+  function setStoredSheetToken(token) {
+    const value = String(token || "").trim();
+    try {
+      localStorage.setItem(SHEET_TOKEN_KEY, value);
+    } catch {
+      /* ignore */
+    }
+    try {
+      sessionStorage.setItem(SHEET_TOKEN_KEY, value);
+    } catch {
+      /* ignore */
+    }
+  }
+
   /** @type {Record<string, unknown>[]} */
   let productsCache = [];
 
@@ -621,7 +651,7 @@
     void bootstrap();
 
     try {
-      const tok = sessionStorage.getItem(SHEET_TOKEN_KEY);
+      const tok = getStoredSheetToken();
       const el = document.getElementById("admin-sheet-token");
       if (tok && el instanceof HTMLInputElement) el.value = tok;
     } catch {
@@ -638,11 +668,7 @@
     document.getElementById("admin-sheet-token")?.addEventListener("change", () => {
       const el = document.getElementById("admin-sheet-token");
       if (el instanceof HTMLInputElement) {
-        try {
-          sessionStorage.setItem(SHEET_TOKEN_KEY, el.value.trim());
-        } catch {
-          /* ignore */
-        }
+        setStoredSheetToken(el.value);
       }
     });
 
@@ -846,7 +872,7 @@
               /* ignore */
             }
             try {
-              sessionStorage.setItem(SHEET_TOKEN_KEY, String(token).trim());
+              setStoredSheetToken(token);
             } catch {
               /* ignore */
             }
@@ -891,7 +917,7 @@
             const syncEl = document.getElementById("admin-sync-sheet");
             if (syncEl instanceof HTMLInputElement) syncEl.checked = false;
             try {
-              const tok = sessionStorage.getItem(SHEET_TOKEN_KEY);
+              const tok = getStoredSheetToken();
               const tel = document.getElementById("admin-sheet-token");
               if (tok && tel instanceof HTMLInputElement) tel.value = tok;
             } catch {
