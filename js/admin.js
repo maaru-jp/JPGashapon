@@ -624,6 +624,7 @@
     if (document.getElementById("admin-label-new")?.checked) labels.push("new");
     if (document.getElementById("admin-label-hot")?.checked) labels.push("hot");
     if (document.getElementById("admin-label-recommend")?.checked) labels.push("recommend");
+    if (document.getElementById("admin-label-featured")?.checked) labels.push("featured");
 
     return {
       id,

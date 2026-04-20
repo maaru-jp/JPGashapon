@@ -253,8 +253,9 @@
     hot: { text: "熱銷", cls: "product-label--hot" },
     new: { text: "新品", cls: "product-label--new" },
     recommend: { text: "推薦", cls: "product-label--recommend" },
+    featured: { text: "精選", cls: "product-label--featured" },
   };
-  const LABEL_ORDER = ["hot", "new", "recommend"];
+  const LABEL_ORDER = ["hot", "new", "recommend", "featured"];
 
   /** @param {string[]|undefined} arr */
   function normalizeLabels(arr) {
@@ -292,6 +293,8 @@
   let cart = loadCart();
 
   const els = {
+    featuredPicksGrid: document.getElementById("featured-picks-grid"),
+    btnViewAllProducts: document.getElementById("btn-view-all-products"),
     grid: document.getElementById("products-grid"),
     pagination: document.getElementById("products-pagination"),
     productsSection: document.getElementById("products-section"),
@@ -469,6 +472,12 @@
     if (activeSpotlight === "all") return true;
     if (activeSpotlight === "coming_soon") return !!p.comingSoon;
     return productHasSpotlightLabel(p, activeSpotlight);
+  }
+
+  /** @param {Record<string, unknown>} p */
+  function isFeaturedProduct(p) {
+    const arr = Array.isArray(p.labels) ? p.labels : [];
+    return arr.includes("featured");
   }
 
   function filterProducts() {
@@ -844,6 +853,59 @@
         </article>`;
   }
 
+  function featuredTagOfProduct(p) {
+    const arr = Array.isArray(p.labels) ? p.labels : [];
+    if (arr.includes("hot")) return { text: "HOT", color: "#e11d2e" };
+    if (arr.includes("new")) return { text: "NEW", color: "#16a34a" };
+    if (arr.includes("recommend")) return { text: "限定", color: "#f97316" };
+    if (arr.includes("featured")) return { text: "精選", color: "#b91c1c" };
+    if (p.comingSoon) return { text: "待上市", color: "#ca8a04" };
+    return { text: "PICK", color: "#e60012" };
+  }
+
+  function renderFeaturedPicks() {
+    if (!els.featuredPicksGrid) return;
+    const picks = products
+      .filter((p) => isProductPublished(p) && isFeaturedProduct(p))
+      .sort((a, b) => {
+        const ac = getTotalPurchaseCount(a);
+        const bc = getTotalPurchaseCount(b);
+        return bc - ac;
+      })
+      .slice(0, 8);
+
+    if (picks.length === 0) {
+      els.featuredPicksGrid.innerHTML = '<p class="featured-picks__empty">目前尚未設定精選商品，請到後台勾選「精選」標籤。</p>';
+      return;
+    }
+
+    els.featuredPicksGrid.innerHTML = picks
+      .map((p) => {
+        const twd = getProductTwd(p);
+        const tag = featuredTagOfProduct(p);
+        const img = p.image
+          ? `<img src="${escapeAttr(p.image)}" alt="" loading="lazy" />`
+          : "";
+        const bg = p.accent || "linear-gradient(135deg, #f3f4f6, #e5e7eb)";
+        return `
+          <article class="featured-pick-card" data-featured-id="${escapeAttr(p.id)}" tabindex="0" role="button" aria-label="查看 ${escapeAttr(
+            p.name
+          )} 詳情">
+            <div class="featured-pick-card__visual" style="background:${escapeAttr(bg)}">
+              <span class="featured-pick-card__tag" style="background:${escapeAttr(tag.color)}">${escapeHtml(tag.text)}</span>
+              ${img}
+            </div>
+            <div class="featured-pick-card__body">
+              <p class="featured-pick-card__series">${escapeHtml(p.series || "")}</p>
+              <h3 class="featured-pick-card__name">${escapeHtml(p.name || "")}</h3>
+              <p class="featured-pick-card__price">NT$${twd}<small> / 個</small></p>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
   function productsSectionHead(title, hint, soonVariant) {
     const extra = soonVariant ? " products-section-head--soon" : "";
     const h = escapeHtml(title);
@@ -922,6 +984,7 @@
     recordPurchaseRegistration(id, 1);
     saveCart();
     renderProducts();
+    renderFeaturedPicks();
     updateCartUI();
     setCopyFeedback("", false);
     if (modalProductId === id) updateProductModalPurchaseStat();
@@ -939,6 +1002,7 @@
     if (delta > 0) recordPurchaseRegistration(id, delta);
     saveCart();
     renderProducts();
+    renderFeaturedPicks();
     renderCartList();
     updateCartUI();
     setCopyFeedback("", false);
@@ -1229,6 +1293,32 @@
     if (id) openProductModal(id);
   });
 
+  if (els.featuredPicksGrid) {
+    els.featuredPicksGrid.addEventListener("click", (e) => {
+      const card = e.target.closest("[data-featured-id]");
+      if (!card || !els.featuredPicksGrid.contains(card)) return;
+      const id = card.getAttribute("data-featured-id");
+      if (id) openProductModal(id);
+    });
+    els.featuredPicksGrid.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const card = e.target.closest("[data-featured-id]");
+      if (!card || !els.featuredPicksGrid.contains(card)) return;
+      e.preventDefault();
+      const id = card.getAttribute("data-featured-id");
+      if (id) openProductModal(id);
+    });
+  }
+
+  if (els.btnViewAllProducts) {
+    els.btnViewAllProducts.addEventListener("click", () => {
+      const target = document.getElementById("product-list") || els.productsSection || els.grid;
+      if (target && typeof target.scrollIntoView === "function") {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
   els.grid.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     if (e.target.closest(".btn-add")) return;
@@ -1272,6 +1362,7 @@
   renderSpotlightFilters();
   renderPriceFilters();
   renderFilters();
+  renderFeaturedPicks();
   renderProducts();
   updateCartUI();
 })();
