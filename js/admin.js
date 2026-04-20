@@ -833,33 +833,52 @@
       }
 
       const pid = String(row.id);
-      const list = loadExtraProducts().filter((x) => String(x.id) !== pid);
-      list.push(row);
-      try {
-        saveExtraProducts(list);
-      } catch (err) {
-        const name = err && /** @type {Error} */ (err).name;
-        if (name === "QuotaExceededError" || String(err).indexOf("QuotaExceeded") !== -1) {
-          setFeedback("儲存失敗：本機空間不足（圖太大或太多）。請刪減圖片、改用圖床網址，或清除部分本機商品。", "err");
-        } else {
-          setFeedback("儲存失敗：" + String(err), "err");
-        }
-        return;
-      }
-
-      const baseOk = "已加入本機商品「" + String(row.name) + "」。";
+      const localListWithoutCurrent = loadExtraProducts().filter((x) => String(x.id) !== pid);
+      const localListWithCurrent = localListWithoutCurrent.concat([row]);
+      const baseOk = "已處理商品「" + String(row.name) + "」。";
       if (sync) {
         void postProductToSheet(row, token)
           .then(() => {
+            // 勾選同步且成功時，移除同 id 的本機覆寫，避免列表持續顯示「本機」。
+            try {
+              saveExtraProducts(localListWithoutCurrent);
+            } catch {
+              /* ignore */
+            }
             try {
               sessionStorage.setItem(SHEET_TOKEN_KEY, String(token).trim());
             } catch {
               /* ignore */
             }
-            setFeedback(baseOk + " 試算表已新增一列（請重新整理確認）。", "ok");
+            setFeedback(baseOk + " 試算表已新增一列，且未保留本機副本。", "ok");
           })
           .catch((err) => {
-            setFeedback(baseOk + " 試算表寫入失敗：" + String(err.message || err), "err");
+            // 同步失敗時保留本機，避免賣家資料遺失。
+            try {
+              saveExtraProducts(localListWithCurrent);
+            } catch (saveErr) {
+              const saveErrName = saveErr && /** @type {Error} */ (saveErr).name;
+              if (
+                saveErrName === "QuotaExceededError" ||
+                String(saveErr).indexOf("QuotaExceeded") !== -1
+              ) {
+                setFeedback(
+                  "試算表寫入失敗，且本機空間不足無法暫存。請刪減圖片、改用圖床網址後重試。原錯誤：" +
+                    String(err.message || err),
+                  "err"
+                );
+                return;
+              }
+              setFeedback(
+                "試算表寫入失敗，且本機暫存失敗：" +
+                  String(saveErr) +
+                  "。原錯誤：" +
+                  String(err.message || err),
+                "err"
+              );
+              return;
+            }
+            setFeedback(baseOk + " 試算表寫入失敗，已暫存本機：" + String(err.message || err), "err");
           })
           .finally(() => {
             const form = document.getElementById("admin-add-form");
@@ -881,8 +900,21 @@
             void bootstrap();
           });
       } else {
+        try {
+          saveExtraProducts(localListWithCurrent);
+        } catch (err) {
+          const name = err && /** @type {Error} */ (err).name;
+          if (name === "QuotaExceededError" || String(err).indexOf("QuotaExceeded") !== -1) {
+            setFeedback("儲存失敗：本機空間不足（圖太大或太多）。請刪減圖片、改用圖床網址，或清除部分本機商品。", "err");
+          } else {
+            setFeedback("儲存失敗：" + String(err), "err");
+          }
+          return;
+        }
         setFeedback(
-          baseOk +
+          "已加入本機商品「" +
+            String(row.name) +
+            "」。" +
             " 請重新整理首頁查看。（未勾選「同步寫入試算表」時，Google 試算表不會新增列。）",
           "ok"
         );
