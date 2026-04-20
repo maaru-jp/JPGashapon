@@ -145,6 +145,18 @@
             </div>
             <div class="admin-gallery-preview" id="admin-gallery-preview" hidden aria-live="polite"></div>
           </div>
+          <div class="admin-field admin-field--full admin-batch-card" aria-labelledby="admin-batch-title">
+            <div class="admin-batch-card__head">
+              <strong id="admin-batch-title" class="admin-batch-card__title">手機批次建商品</strong>
+              <span class="admin-batch-card__hint">一次多選照片，自動建立多筆商品草稿</span>
+            </div>
+            <input type="file" id="admin-file-batch-products" class="visually-hidden" accept="image/*" multiple tabindex="-1" />
+            <div class="admin-upload-row">
+              <button type="button" class="btn primary admin-btn-upload" id="admin-btn-batch-products">多圖上傳並批次建商品</button>
+              <span class="admin-upload-hint">會沿用目前表單設定（系列、機台價、標籤、狀態）。名稱優先使用檔名。</span>
+            </div>
+            <p class="admin-batch-card__status" id="admin-batch-status" aria-live="polite"></p>
+          </div>
           <label class="admin-field admin-field--full">
             <span class="admin-field__label">說明</span>
             <textarea id="admin-field-description" name="description" rows="3"></textarea>
