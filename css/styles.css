@@ -353,6 +353,153 @@ a.btn {
   scroll-margin-top: 9.75rem;
 }
 
+.featured-picks {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem clamp(1rem, 4vw, 2rem) 1.15rem;
+}
+
+.featured-picks__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.featured-picks__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--accent-red);
+}
+
+.featured-picks__title {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3.3vw, 1.65rem);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.featured-picks__all-btn {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-red);
+  background: #fff;
+  border: 1px solid rgba(230, 0, 18, 0.35);
+  border-radius: 999px;
+  padding: 0.52rem 0.95rem;
+  cursor: pointer;
+}
+
+.featured-picks__all-btn:hover {
+  background: rgba(230, 0, 18, 0.06);
+}
+
+.featured-picks__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.featured-pick-card {
+  background: #fff;
+  border: 1px solid #ececf1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(28, 28, 30, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.featured-pick-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(230, 0, 18, 0.25);
+  box-shadow: 0 10px 24px rgba(28, 28, 30, 0.1);
+}
+
+.featured-pick-card__visual {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f3f4f6;
+  position: relative;
+}
+
+.featured-pick-card__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-pick-card__tag {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  border-radius: 5px;
+  padding: 0.16rem 0.42rem;
+}
+
+.featured-pick-card__body {
+  padding: 0.65rem 0.75rem 0.8rem;
+}
+
+.featured-pick-card__series {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.featured-pick-card__name {
+  margin: 0.16rem 0 0.45rem;
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.featured-pick-card__price {
+  margin: 0;
+  color: var(--accent-red);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.featured-pick-card__price small {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.featured-picks__empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed #d8d8df;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.product-label--featured {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.25);
+}
+
+@media (max-width: 980px) {
+  .featured-picks__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .hero-inner {
   position: relative;
   max-width: 1200px;
