@@ -32,6 +32,12 @@
     </div>
   </header>
 
+  <nav class="quick-nav" aria-label="頁面導覽">
+    <a href="#featured-products" class="quick-nav__link">精選商品</a>
+    <a href="#product-list" class="quick-nav__link">商品一覽</a>
+    <a href="#purchase-guide" class="quick-nav__link">代購說明</a>
+  </nav>
+
   <div class="howto" id="howto-panel" hidden>
     <ol>
       <li>瀏覽扭蛋卡並點開詳情；「待上市」僅預覽，可連線選購款可點「加入購物車」。</li>
@@ -56,7 +62,7 @@
     </div>
   </div>
 
-  <section class="hero-carousel" aria-roledescription="輪播" aria-label="主打活動">
+  <section class="hero-carousel" id="featured-products" aria-roledescription="輪播" aria-label="主打活動">
     <div class="hero-inner">
       <div class="hero-viewport" id="hero-viewport">
         <div class="hero-track" id="hero-track" role="list"></div>
@@ -71,7 +77,7 @@
     </div>
   </section>
 
-  <section class="order-flow" aria-labelledby="order-flow-title">
+  <section class="order-flow" id="purchase-guide" aria-labelledby="order-flow-title">
     <div class="order-flow__inner">
       <header class="order-flow__head">
         <p class="order-flow__eyebrow">HOW TO ORDER</p>
@@ -149,7 +155,7 @@
   </section>
 
   <main class="catalog-main">
-    <section class="catalog-head">
+    <section class="catalog-head" id="product-list">
       <p class="catalog-head__eyebrow">PRODUCTS</p>
       <div class="catalog-head__title-row">
         <span class="catalog-head__bar" aria-hidden="true"></span>
