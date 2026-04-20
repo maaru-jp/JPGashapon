@@ -88,6 +88,13 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
+}
+
+.brand:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.16);
+  border-radius: 10px;
 }
 
 .brand-icon {
