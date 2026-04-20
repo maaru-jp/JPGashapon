@@ -48,7 +48,7 @@ window.GACHA_CLOUDINARY_FOLDER = "Gashapon";
 /**
  * 為 true 時，後台「加入商品」會預設勾選「同步寫入試算表」（仍須填 ADMIN_TOKEN）。
  */
-window.GACHA_AUTO_SYNC_SHEET = true;
+window.GACHA_AUTO_SYNC_SHEET = false;
 
 /**
  * 本機「上架／下架」覆寫的 localStorage 鍵（由 admin.html 寫入）。
