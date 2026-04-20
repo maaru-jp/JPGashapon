@@ -452,10 +452,16 @@
     select.value = nextValue;
   }
 
-  function generateTempProductName() {
+  function setBatchStatus(msg) {
+    const el = document.getElementById("admin-batch-status");
+    if (!el) return;
+    el.textContent = msg || "";
+  }
+
+  function getTempNameMaxFromProducts(list) {
     const re = /^扭蛋-(\d{4,})$/;
     let maxNum = 0;
-    (Array.isArray(productsCache) ? productsCache : []).forEach((p) => {
+    (Array.isArray(list) ? list : []).forEach((p) => {
       const name = p && p.name != null ? String(p.name).trim() : "";
       const m = re.exec(name);
       if (m) {
@@ -463,6 +469,29 @@
         if (Number.isFinite(n) && n > maxNum) maxNum = n;
       }
     });
+    return maxNum;
+  }
+
+  function guessNameFromFilename(filename) {
+    const raw = String(filename || "").replace(/\.[^.]+$/, "").trim();
+    if (!raw) return "";
+    return raw.replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  function createUniqueProductId(existingIdSet) {
+    let i = 0;
+    let id = "";
+    do {
+      const suffix = i > 0 ? "-" + i : "";
+      id = "new-" + Date.now() + suffix;
+      i += 1;
+    } while (existingIdSet.has(id));
+    existingIdSet.add(id);
+    return id;
+  }
+
+  function generateTempProductName() {
+    const maxNum = getTempNameMaxFromProducts(productsCache);
     return "扭蛋-" + String(maxNum + 1).padStart(4, "0");
   }
 
@@ -809,6 +838,104 @@
           )
         )
         .catch((err) => setFeedback(String(err.message || err), "err"));
+    });
+
+    document.getElementById("admin-btn-batch-products")?.addEventListener("click", () => {
+      document.getElementById("admin-file-batch-products")?.click();
+    });
+    document.getElementById("admin-file-batch-products")?.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLInputElement) || !t.files || !t.files.length) return;
+      const files = Array.from(t.files);
+      t.value = "";
+
+      const series = (document.getElementById("admin-field-series")?.value || "").trim();
+      if (!series) {
+        setFeedback("批次建立前請先填寫系列。", "err");
+        setBatchStatus("");
+        return;
+      }
+
+      const jpy = Number(document.getElementById("admin-field-jpy")?.value || 300);
+      const capsule = (document.getElementById("admin-field-capsule")?.value || "").trim();
+      const accent = (document.getElementById("admin-field-accent")?.value || "").trim();
+      const description = (document.getElementById("admin-field-description")?.value || "").trim();
+      const launchNote = (document.getElementById("admin-field-launchNote")?.value || "").trim();
+      const comingSoon = !!document.getElementById("admin-field-comingSoon")?.checked;
+      const published = !!document.getElementById("admin-field-published")?.checked;
+      const labels = [];
+      if (document.getElementById("admin-label-new")?.checked) labels.push("new");
+      if (document.getElementById("admin-label-hot")?.checked) labels.push("hot");
+      if (document.getElementById("admin-label-recommend")?.checked) labels.push("recommend");
+      if (document.getElementById("admin-label-featured")?.checked) labels.push("featured");
+
+      const btn = document.getElementById("admin-btn-batch-products");
+      if (btn instanceof HTMLButtonElement) btn.disabled = true;
+
+      void (async () => {
+        const currentExtras = loadExtraProducts();
+        const existingIdSet = new Set(
+          (Array.isArray(productsCache) ? productsCache : [])
+            .concat(currentExtras)
+            .map((p) => (p && p.id != null ? String(p.id) : ""))
+            .filter(Boolean)
+        );
+        let tempNameNum = getTempNameMaxFromProducts(
+          (Array.isArray(productsCache) ? productsCache : []).concat(currentExtras)
+        );
+        const created = [];
+        let failed = 0;
+
+        for (let i = 0; i < files.length; i += 1) {
+          const file = files[i];
+          setBatchStatus(`正在處理第 ${i + 1}/${files.length} 張：${file.name}`);
+          try {
+            const image = await processImageFileForUpload(file);
+            const guessed = guessNameFromFilename(file.name);
+            let name = guessed;
+            if (!name) {
+              tempNameNum += 1;
+              name = "扭蛋-" + String(tempNameNum).padStart(4, "0");
+            }
+            created.push({
+              id: createUniqueProductId(existingIdSet),
+              name,
+              series,
+              jpy: Number.isFinite(jpy) && jpy > 0 ? jpy : 300,
+              capsule,
+              image,
+              accent,
+              gallery: "",
+              description,
+              specs: [],
+              launchNote,
+              labels,
+              comingSoon,
+              published,
+            });
+          } catch (err) {
+            failed += 1;
+            console.warn("[admin] 批次建立失敗：", file && file.name, err);
+          }
+        }
+
+        if (created.length) {
+          saveExtraProducts(currentExtras.concat(created));
+          setFeedback(
+            `批次建立完成：成功 ${created.length} 筆${failed ? `，失敗 ${failed} 筆` : ""}。`,
+            failed ? "" : "ok"
+          );
+        } else {
+          setFeedback("批次建立失敗：沒有成功建立任何商品。", "err");
+        }
+        setBatchStatus("");
+        await bootstrap();
+        if (btn instanceof HTMLButtonElement) btn.disabled = false;
+      })().catch((err) => {
+        setBatchStatus("");
+        if (btn instanceof HTMLButtonElement) btn.disabled = false;
+        setFeedback("批次建立失敗：" + String((err && err.message) || err), "err");
+      });
     });
 
     const dropMain = document.getElementById("admin-drop-main");
