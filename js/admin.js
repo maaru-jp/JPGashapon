@@ -387,6 +387,19 @@
       .replace(/>/g, "&gt;");
   }
 
+  function renderSeriesOptions(products) {
+    const list = document.getElementById("admin-series-options");
+    if (!(list instanceof HTMLDataListElement)) return;
+    const names = Array.from(
+      new Set(
+        (Array.isArray(products) ? products : [])
+          .map((p) => (p && p.series != null ? String(p.series).trim() : ""))
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b, "zh-Hant"));
+    list.innerHTML = names.map((name) => `<option value="${escapeAttr(name)}"></option>`).join("");
+  }
+
   function setFeedback(msg, kind) {
     const el = document.getElementById("admin-feedback");
     if (!el) return;
@@ -641,6 +654,7 @@
     const baseOnly = await loadBaseProducts();
     const extras = loadExtraProducts();
     productsCache = mergeWithExtras(baseOnly, extras);
+    renderSeriesOptions(productsCache);
     const extraIdSet = new Set(
       extras.map((e) => (e && e.id != null ? String(e.id) : "")).filter(Boolean)
     );
