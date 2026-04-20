@@ -138,6 +138,7 @@ body {
 }
 
 .quick-nav__link {
+  position: relative;
   text-decoration: none;
   color: #2f3d4a;
   font-size: clamp(0.95rem, 2vw, 1.05rem);
@@ -148,17 +149,35 @@ body {
   transition: color 0.2s ease, background 0.2s ease;
 }
 
+.quick-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  right: 0.3rem;
+  bottom: -0.08rem;
+  height: 2px;
+  background: var(--accent-red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.24s ease;
+}
+
 .quick-nav__link:hover {
   color: var(--accent-red);
-  text-decoration: underline;
-  text-underline-offset: 0.22em;
-  text-decoration-thickness: 2px;
+}
+
+.quick-nav__link:hover::after {
+  transform: scaleX(1);
 }
 
 .quick-nav__link:focus-visible {
   outline: none;
   color: var(--accent-red);
   box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.16);
+}
+
+.quick-nav__link:focus-visible::after {
+  transform: scaleX(1);
 }
 
 /* Buttons */
