@@ -62,7 +62,7 @@
     </div>
   </div>
 
-  <section class="hero-carousel" id="featured-products" aria-roledescription="輪播" aria-label="主打活動">
+  <section class="hero-carousel" aria-roledescription="輪播" aria-label="主打活動">
     <div class="hero-inner">
       <div class="hero-viewport" id="hero-viewport">
         <div class="hero-track" id="hero-track" role="list"></div>
@@ -75,6 +75,17 @@
       </button>
       <div class="hero-dots" id="hero-dots" role="tablist" aria-label="選擇輪播頁"></div>
     </div>
+  </section>
+
+  <section class="featured-picks" id="featured-products" aria-labelledby="featured-picks-title">
+    <div class="featured-picks__head">
+      <div class="featured-picks__title-wrap">
+        <p class="featured-picks__eyebrow">PICK UP</p>
+        <h2 id="featured-picks-title" class="featured-picks__title">おすすめ・精選推薦</h2>
+      </div>
+      <button type="button" class="featured-picks__all-btn" id="btn-view-all-products">全部商品</button>
+    </div>
+    <div class="featured-picks__grid" id="featured-picks-grid" aria-live="polite"></div>
   </section>
 
   <section class="order-flow" id="purchase-guide" aria-labelledby="order-flow-title">
