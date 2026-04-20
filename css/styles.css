@@ -126,6 +126,39 @@ body {
   gap: 0.5rem;
 }
 
+.quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.75rem, 3.5vw, 2.2rem);
+  padding: 0.95rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--grid-line);
+}
+
+.quick-nav__link {
+  text-decoration: none;
+  color: #2f3d4a;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.3rem;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.quick-nav__link:hover {
+  color: var(--accent-red);
+  background: rgba(230, 0, 18, 0.06);
+}
+
+.quick-nav__link:focus-visible {
+  outline: none;
+  color: var(--accent-red);
+  box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.16);
+}
+
 /* Buttons */
 .btn {
   font-family: inherit;
@@ -291,6 +324,12 @@ a.btn {
 /* Hero carousel */
 .hero-carousel {
   padding: 1.25rem clamp(1rem, 4vw, 2rem) 0.5rem;
+}
+
+#featured-products,
+#product-list,
+#purchase-guide {
+  scroll-margin-top: 9.75rem;
 }
 
 .hero-inner {
