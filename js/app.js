@@ -293,6 +293,7 @@
   let cart = loadCart();
 
   const els = {
+    brandReload: document.getElementById("brand-reload"),
     featuredPicksGrid: document.getElementById("featured-picks-grid"),
     btnViewAllProducts: document.getElementById("btn-view-all-products"),
     grid: document.getElementById("products-grid"),
@@ -423,6 +424,13 @@
     return `<p class="product-purchase-stat" aria-label="購買登記 ${n} 次">${formatPurchaseStatLine(n)}</p>`;
   }
 
+  function productDisplayName(p) {
+    const name = p && p.name != null ? String(p.name).trim() : "";
+    if (name) return name;
+    const id = p && p.id != null ? String(p.id).trim() : "";
+    return id ? `商品 ${id}` : "未命名商品";
+  }
+
   function updateProductModalPurchaseStat() {
     if (!els.productModalPurchase) return;
     if (!modalProductId) {
@@ -460,6 +468,19 @@
   function matchesActivePriceTier(p) {
     if (activePriceRange === "all") return true;
     return Number(p.jpy) === Number(activePriceRange);
+  }
+
+  function getAvailablePriceTiers() {
+    const tierSet = new Set();
+    Object.keys(JPY_TO_TWD).forEach((k) => {
+      const n = Number(k);
+      if (Number.isFinite(n) && n > 0) tierSet.add(n);
+    });
+    products.forEach((p) => {
+      const n = Number(p && p.jpy);
+      if (Number.isFinite(n) && n > 0) tierSet.add(n);
+    });
+    return Array.from(tierSet).sort((a, b) => a - b);
   }
 
   /** @param {'new'|'hot'|'recommend'} key */
@@ -508,14 +529,15 @@
   function buildGallerySlides(p) {
     const accent = p.accent || "linear-gradient(145deg, #fce7f3, #fbcfe8)";
     const slides = [];
+    const displayName = productDisplayName(p);
     if (p.image) {
-      slides.push({ kind: "image", src: p.image, alt: p.name });
+      slides.push({ kind: "image", src: p.image, alt: displayName });
     } else {
       slides.push({ kind: "gradient", gradient: accent, caption: "商品示意" });
     }
     const gal = Array.isArray(p.gallery) ? p.gallery : [];
     gal.forEach((src) => {
-      if (src) slides.push({ kind: "image", src, alt: p.name });
+      if (src) slides.push({ kind: "image", src, alt: displayName });
     });
     if (slides.length < 2) {
       slides.push({ kind: "gradient", gradient: accent, caption: "更多角度參考" });
@@ -525,7 +547,7 @@
 
   function getDescription(p) {
     if (p.description && String(p.description).trim()) return String(p.description).trim();
-    return `${p.name}（${p.series}）。${p.capsule || ""}。現場扭蛋隨機出貨，實際款式以連線當下為準；可於下單備註許願，由小幫手協助留意。`;
+    return `${productDisplayName(p)}（${p.series}）。${p.capsule || ""}。現場扭蛋隨機出貨，實際款式以連線當下為準；可於下單備註許願，由小幫手協助留意。`;
   }
 
   function getSpecs(p) {
@@ -606,7 +628,8 @@
         els.productModalLabels.hidden = true;
       }
     }
-    if (els.productModalTitle) els.productModalTitle.textContent = p.name;
+    const displayName = productDisplayName(p);
+    if (els.productModalTitle) els.productModalTitle.textContent = displayName;
     if (els.productModalPrice) {
       const twd = getProductTwd(p);
       const jpy = p.jpy != null ? p.jpy : "—";
@@ -731,15 +754,12 @@
 
   function renderPriceFilters() {
     if (!els.priceFilters) return;
-    const opts = [
-      { id: "all", label: "全部" },
-      { id: "100", label: "¥100" },
-      { id: "200", label: "¥200" },
-      { id: "300", label: "¥300" },
-      { id: "400", label: "¥400" },
-      { id: "500", label: "¥500" },
-      { id: "600", label: "¥600" },
-    ];
+    const opts = [{ id: "all", label: "全部" }].concat(
+      getAvailablePriceTiers().map((n) => ({ id: String(n), label: `¥${n}` }))
+    );
+    if (activePriceRange !== "all" && !opts.some((o) => o.id === String(activePriceRange))) {
+      activePriceRange = "all";
+    }
     els.priceFilters.innerHTML = opts
       .map(
         (o) =>
@@ -833,7 +853,7 @@
         <article class="product-card${cardSoon}" data-id="${escapeAttr(
           p.id
         )}" tabindex="0" role="button" data-soon="${soon ? "1" : "0"}" aria-label="查看 ${escapeAttr(
-          p.name
+          productDisplayName(p)
         )} 詳情">
           <div class="product-visual${visualSoon}${placeholderClass}" style="background:${bg}">
             ${cardLabelsRowHtml(p)}
@@ -842,7 +862,7 @@
           </div>
           <div class="product-body">
             <p class="product-series">${escapeHtml(p.series)}</p>
-            <h3 class="product-name">${escapeHtml(p.name)}</h3>
+            <h3 class="product-name">${escapeHtml(productDisplayName(p))}</h3>
             <p class="product-meta">${escapeHtml(p.capsule || "")}</p>
             ${purchaseStatRowHtml(p)}
             <div class="product-row">
@@ -889,7 +909,7 @@
         const bg = p.accent || "linear-gradient(135deg, #f3f4f6, #e5e7eb)";
         return `
           <article class="featured-pick-card" data-featured-id="${escapeAttr(p.id)}" tabindex="0" role="button" aria-label="查看 ${escapeAttr(
-            p.name
+            productDisplayName(p)
           )} 詳情">
             <div class="featured-pick-card__visual" style="background:${escapeAttr(bg)}">
               <span class="featured-pick-card__tag" style="background:${escapeAttr(tag.color)}">${escapeHtml(tag.text)}</span>
@@ -897,7 +917,7 @@
             </div>
             <div class="featured-pick-card__body">
               <p class="featured-pick-card__series">${escapeHtml(p.series || "")}</p>
-              <h3 class="featured-pick-card__name">${escapeHtml(p.name || "")}</h3>
+              <h3 class="featured-pick-card__name">${escapeHtml(productDisplayName(p))}</h3>
               <p class="featured-pick-card__price">NT$${twd}<small> / 個</small></p>
             </div>
           </article>
@@ -1316,6 +1336,16 @@
       if (target && typeof target.scrollIntoView === "function") {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
       }
+    });
+  }
+
+  if (els.brandReload) {
+    const reloadPage = () => window.location.reload();
+    els.brandReload.addEventListener("click", reloadPage);
+    els.brandReload.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      reloadPage();
     });
   }
 

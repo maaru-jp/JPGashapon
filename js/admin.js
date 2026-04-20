@@ -4,6 +4,17 @@
   const KEY = window.GACHA_PUBLISHED_STORAGE_KEY || "gacha-published-overrides-v1";
   const EXTRA_KEY = window.GACHA_EXTRA_PRODUCTS_KEY || "gacha-products-extra-v1";
   const SHEET_TOKEN_KEY = "gacha-admin-sheet-token-v1";
+  const FALLBACK_JPY_TIERS = [100, 200, 300, 400, 500, 600];
+  const DEFAULT_JPY_TIERS = Array.from(
+    new Set(
+      Object.keys(window.GACHA_JPY_TO_TWD || {})
+        .map((k) => Number(k))
+        .filter((n) => Number.isFinite(n) && n > 0)
+        .concat(FALLBACK_JPY_TIERS)
+    )
+  ).sort((a, b) => a - b);
+  /** @type {number[]} */
+  let jpyTierOptions = [...DEFAULT_JPY_TIERS];
 
   function getStoredSheetToken() {
     try {
@@ -250,6 +261,12 @@
         const res = await fetch(url, { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
+          if (data && typeof data.jpyToTwd === "object" && data.jpyToTwd !== null) {
+            const remoteTiers = Object.keys(data.jpyToTwd)
+              .map((k) => Number(k))
+              .filter((n) => Number.isFinite(n) && n > 0);
+            mergeJpyTierOptions(remoteTiers);
+          }
           if (Array.isArray(data.products)) list = data.products;
         }
       } catch (e) {
@@ -398,6 +415,62 @@
       )
     ).sort((a, b) => a.localeCompare(b, "zh-Hant"));
     list.innerHTML = names.map((name) => `<option value="${escapeAttr(name)}"></option>`).join("");
+  }
+
+  function mergeJpyTierOptions(next) {
+    const merged = Array.from(
+      new Set(
+        jpyTierOptions
+          .concat(Array.isArray(next) ? next : [])
+          .map((n) => Number(n))
+          .filter((n) => Number.isFinite(n) && n > 0)
+      )
+    ).sort((a, b) => a - b);
+    if (merged.length) jpyTierOptions = merged;
+  }
+
+  /** @param {Record<string, unknown>[]} products */
+  function updateJpyTierOptionsFromProducts(products) {
+    const tiers = (Array.isArray(products) ? products : [])
+      .map((p) => Number(p && p.jpy))
+      .filter((n) => Number.isFinite(n) && n > 0);
+    mergeJpyTierOptions(tiers);
+  }
+
+  function renderJpyTierSelect() {
+    const select = document.getElementById("admin-field-jpy");
+    if (!(select instanceof HTMLSelectElement)) return;
+    const prev = String(select.value || "300");
+    select.innerHTML = jpyTierOptions
+      .map((n) => `<option value="${n}">${n}</option>`)
+      .join("");
+    const nextValue = jpyTierOptions.includes(Number(prev))
+      ? prev
+      : jpyTierOptions.includes(300)
+      ? "300"
+      : String(jpyTierOptions[0] || 300);
+    select.value = nextValue;
+  }
+
+  function generateTempProductName() {
+    const re = /^扭蛋-(\d{4,})$/;
+    let maxNum = 0;
+    (Array.isArray(productsCache) ? productsCache : []).forEach((p) => {
+      const name = p && p.name != null ? String(p.name).trim() : "";
+      const m = re.exec(name);
+      if (m) {
+        const n = Number(m[1]);
+        if (Number.isFinite(n) && n > maxNum) maxNum = n;
+      }
+    });
+    return "扭蛋-" + String(maxNum + 1).padStart(4, "0");
+  }
+
+  function resetJpyTierSelect() {
+    const select = document.getElementById("admin-field-jpy");
+    if (!(select instanceof HTMLSelectElement)) return;
+    const fallback = jpyTierOptions.includes(300) ? "300" : String(jpyTierOptions[0] || 300);
+    select.value = fallback;
   }
 
   function setFeedback(msg, kind) {
@@ -587,9 +660,10 @@
    * @returns {{ id: string; name: string; series: string; error?: string } | Record<string, unknown> | null}
    */
   function buildProductFromForm() {
-    const name = (document.getElementById("admin-field-name")?.value || "").trim();
+    const rawName = (document.getElementById("admin-field-name")?.value || "").trim();
+    const name = rawName || generateTempProductName();
     const series = (document.getElementById("admin-field-series")?.value || "").trim();
-    if (!name || !series) return null;
+    if (!series) return null;
 
     const idRaw = (document.getElementById("admin-field-id")?.value || "").trim();
     const id = idRaw || "new-" + Date.now();
@@ -655,6 +729,8 @@
     const baseOnly = await loadBaseProducts();
     const extras = loadExtraProducts();
     productsCache = mergeWithExtras(baseOnly, extras);
+    updateJpyTierOptionsFromProducts(productsCache);
+    renderJpyTierSelect();
     renderSeriesOptions(productsCache);
     const extraIdSet = new Set(
       extras.map((e) => (e && e.id != null ? String(e.id) : "")).filter(Boolean)
@@ -857,7 +933,7 @@
       e.preventDefault();
       const out = buildProductFromForm();
       if (!out) {
-        setFeedback("請填寫名稱與系列。", "err");
+        setFeedback("請填寫系列。名稱可留空會自動產生流水號。", "err");
         return;
       }
       if ("error" in out && out.error) {
@@ -925,8 +1001,7 @@
             const form = document.getElementById("admin-add-form");
             if (form instanceof HTMLFormElement) form.reset();
             clearUploadUI();
-            const jpyEl = document.getElementById("admin-field-jpy");
-            if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
+            resetJpyTierSelect();
             const pubEl = document.getElementById("admin-field-published");
             if (pubEl instanceof HTMLInputElement) pubEl.checked = true;
             const syncEl = document.getElementById("admin-sync-sheet");
@@ -962,8 +1037,7 @@
         const form = document.getElementById("admin-add-form");
         if (form instanceof HTMLFormElement) form.reset();
         clearUploadUI();
-        const jpyEl = document.getElementById("admin-field-jpy");
-        if (jpyEl instanceof HTMLSelectElement) jpyEl.value = "300";
+        resetJpyTierSelect();
         const pubEl = document.getElementById("admin-field-published");
         if (pubEl instanceof HTMLInputElement) pubEl.checked = true;
         void bootstrap();
