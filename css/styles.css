@@ -150,7 +150,9 @@ body {
 
 .quick-nav__link:hover {
   color: var(--accent-red);
-  background: rgba(230, 0, 18, 0.06);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 2px;
 }
 
 .quick-nav__link:focus-visible {
