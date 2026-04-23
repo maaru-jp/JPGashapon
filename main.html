@@ -1,0 +1,1640 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-theme="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MAARU 日本萌GO｜連線代購預告</title>
+  <meta name="description" content="行前公開行程表與連線代購品項預告，提供預估代購價、儲值規則與注意事項" />
+  <style>
+    :root{
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --muted:#5b677a;
+      --text:#101828;
+      --line:#e6ebf5;
+
+      --accent:#7aa7ff;
+      --accent2:#b7d4ff;
+      --cream:#fff7ea;
+      --shadow: 0 10px 26px rgba(16,24,40,.08);
+      --radius: 18px;
+
+      --good:#1f8a65;
+      --warn:#b7791f;
+      --bad:#b42318;
+
+      --focus: 0 0 0 4px rgba(122,167,255,.22);
+      --accent-bg: rgba(122,167,255,.12);
+      --accent-border: rgba(122,167,255,.28);
+      --toast-bg: #101828;
+      --toast-text: #fff;
+      --trip-date: #dc2626;
+    }
+    /* 主題：和風（和紙・紺・暖米） */
+    html[data-theme="wafu"]{
+      --bg:#f5f2eb;
+      --card:#faf8f3;
+      --muted:#5c5348;
+      --text:#2a2520;
+      --line:#e0d9cf;
+      --accent:#3d5a80;
+      --accent2:#6b8cb0;
+      --cream:#f0ebe3;
+      --shadow: 0 10px 26px rgba(45,40,32,.08);
+      --focus: 0 0 0 4px rgba(61,90,128,.22);
+      --accent-bg: rgba(61,90,128,.12);
+      --accent-border: rgba(61,90,128,.28);
+      --toast-bg: #2a2520;
+      --toast-text: #faf8f3;
+      --trip-date: #3d5a80;
+    }
+    html[data-theme="wafu"] body{
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(61,90,128,.12), transparent 60%),
+        radial-gradient(850px 520px at 90% 12%, rgba(220,210,195,.5), transparent 55%),
+        radial-gradient(900px 650px at 55% 100%, rgba(248,245,238,.9), transparent 55%),
+        var(--bg);
+    }
+    html[data-theme="wafu"] .logo{
+      background: linear-gradient(135deg, rgba(61,90,128,.92), rgba(107,140,176,.9));
+    }
+    /* 主題：抹茶（茶色・奶白） */
+    html[data-theme="matcha"]{
+      --bg:#f2f5ef;
+      --card:#fafbf8;
+      --muted:#5a6048;
+      --text:#252a20;
+      --line:#d4ddce;
+      --accent:#6b7d5a;
+      --accent2:#8fa87a;
+      --cream:#f0f3ec;
+      --shadow: 0 10px 26px rgba(32,40,28,.07);
+      --focus: 0 0 0 4px rgba(107,125,90,.22);
+      --accent-bg: rgba(107,125,90,.12);
+      --accent-border: rgba(107,125,90,.28);
+      --toast-bg: #252a20;
+      --toast-text: #fafbf8;
+      --trip-date: #6b7d5a;
+    }
+    html[data-theme="matcha"] body{
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(107,125,90,.1), transparent 60%),
+        radial-gradient(850px 520px at 90% 12%, rgba(197,212,196,.35), transparent 55%),
+        radial-gradient(900px 650px at 55% 100%, rgba(250,251,248,.9), transparent 55%),
+        var(--bg);
+    }
+    html[data-theme="matcha"] .logo{
+      background: linear-gradient(135deg, rgba(107,125,90,.9), rgba(143,168,122,.9));
+    }
+    /* 主題：深色 */
+    html[data-theme="dark"]{
+      --bg:#1a1d24;
+      --card:#252932;
+      --muted:#9ca3b4;
+      --text:#e8eaef;
+      --line:#3a3f4b;
+      --accent:#6b9fff;
+      --accent2:#4a7ae8;
+      --cream:#2a2e38;
+      --shadow: 0 10px 26px rgba(0,0,0,.35);
+      --focus: 0 0 0 4px rgba(107,159,255,.3);
+      --accent-bg: rgba(107,159,255,.14);
+      --accent-border: rgba(107,159,255,.35);
+      --toast-bg: #e8eaef;
+      --toast-text: #1a1d24;
+      --trip-date: #93c5fd;
+    }
+    html[data-theme="dark"] body{
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(107,159,255,.15), transparent 60%),
+        radial-gradient(850px 520px at 90% 12%, rgba(74,122,232,.12), transparent 55%),
+        var(--bg);
+    }
+    html[data-theme="dark"] .logo{
+      background: linear-gradient(135deg, rgba(107,159,255,.9), rgba(74,122,232,.9));
+    }
+    html[data-theme="dark"] .pill-trip{
+      background: rgba(107,159,255,.18);
+      border-color: rgba(107,159,255,.4);
+    }
+    html[data-theme="dark"] .pill-trip .trip-label,
+    html[data-theme="dark"] .pill-trip .trip-dates{ color: #fff; }
+    html[data-theme="dark"] .badge-mini.badge-abandon{
+      color: #fff;
+      background: rgba(220,38,38,.35);
+      border-color: rgba(220,38,38,.6);
+      font-weight: 800;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* 主題：森林 */
+    html[data-theme="forest"]{
+      --bg:#f0f7f0;
+      --card:#fafdfa;
+      --muted:#4a5c4a;
+      --text:#0f1a0f;
+      --line:#c8e0c8;
+      --accent:#2d8a4e;
+      --accent2:#6bb87a;
+      --cream:#f5faf5;
+      --shadow: 0 10px 26px rgba(16,40,24,.08);
+      --focus: 0 0 0 4px rgba(45,138,78,.22);
+      --accent-bg: rgba(45,138,78,.12);
+      --accent-border: rgba(45,138,78,.28);
+      --toast-bg: #0f1a0f;
+      --toast-text: #f0f7f0;
+      --trip-date: #2d8a4e;
+    }
+    html[data-theme="forest"] body{
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(45,138,78,.15), transparent 60%),
+        radial-gradient(850px 520px at 90% 12%, rgba(107,184,122,.2), transparent 55%),
+        radial-gradient(900px 650px at 55% 100%, rgba(245,250,245,.85), transparent 55%),
+        var(--bg);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 12% 10%, rgba(122,167,255,.22), transparent 60%),
+        radial-gradient(850px 520px at 90% 12%, rgba(183,212,255,.25), transparent 55%),
+        radial-gradient(900px 650px at 55% 100%, rgba(255,247,234,.80), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1100px; margin:0 auto; padding:24px 18px 56px}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 0 18px;}
+    .brand{display:flex; align-items:center; gap:12px;}
+    .brand-link{
+      display:inline-flex; align-items:center; gap:12px;
+      padding:8px 12px 8px 8px; margin:-8px 0 -8px -12px; margin-left:14px;
+      border-radius:16px;
+      background: rgba(255,255,255,.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border:1px solid rgba(255,255,255,.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      text-decoration:none; color:inherit;
+      transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+    }
+    .brand-link:hover{
+      transform: scale(1.03) translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      background: rgba(255,255,255,.5);
+    }
+    html[data-theme="dark"] .brand-link{
+      background: rgba(37,41,50,.5);
+      border-color: rgba(255,255,255,.12);
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    html[data-theme="dark"] .brand-link:hover{
+      background: rgba(37,41,50,.75);
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      overflow:hidden;
+      flex-shrink:0;
+      position:relative;
+      background: var(--card);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .logo img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .brand h1{font-size:15px; margin:0}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .topbar-left{ flex:1; min-width:0; display:flex; align-items:center; }
+    .topbar-center{ display:flex; justify-content:center; flex-shrink:0; }
+    .topbar-entry{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px; border-radius:999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border:1px solid rgba(255,255,255,.28);
+      font-size:15px; font-weight:800; color:#fff;
+      box-shadow: 0 4px 18px rgba(122,167,255,.32);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .topbar-entry:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(122,167,255,.42);
+    }
+    .topbar-entry::before{ content:"✦ "; font-size:.92em; opacity:.95; }
+    .topbar-right{display:flex; align-items:center; justify-content:flex-end; gap:12px; flex-wrap:wrap; flex:1; min-width:0;}
+    .theme-switcher{
+      display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    }
+    .theme-switcher label{font-size:11px; color:var(--muted); margin-right:2px;}
+    .theme-switcher button{
+      padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+      background:var(--card); color:var(--text);
+      font-size:12px; font-weight:700; cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .theme-switcher button:hover{transform:translateY(-1px); box-shadow: var(--shadow);}
+    .theme-switcher button[aria-pressed="true"]{
+      background:var(--accent); color:var(--toast-text); border-color:var(--accent);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .pill b{font-size:12px}
+    .pill-trip{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 16px 10px 14px; border-radius:14px;
+      background: linear-gradient(135deg, var(--card) 0%, var(--accent-bg) 100%);
+      border:2px solid var(--accent-border);
+      box-shadow: var(--shadow);
+    }
+    .pill-trip .trip-label{
+      font-size:11px; font-weight:800; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.12em;
+      white-space:nowrap;
+    }
+    .pill-trip .trip-dates{ font-size:14px; font-weight:900; color:var(--trip-date); }
+    .pill-trip{ min-width: 0; flex-shrink: 0; }
+
+    .hero{display:grid; grid-template-columns: 1.15fr .85fr; gap:16px; align-items:stretch; margin-top:6px;}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+      position:relative;
+    }
+
+    .corner{position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:2;}
+    .sticker{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background: var(--card);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      font-size:12px; font-weight:900; color:var(--text);
+      white-space:nowrap;
+    }
+    .sticker .emo{font-size:14px}
+    .sticker.blue{background: linear-gradient(135deg, var(--card), var(--accent2));}
+    .sticker.cream{background: linear-gradient(135deg, var(--card), var(--cream));}
+
+    .hero-main{padding:26px 24px 28px;}
+    .hero-main .deposit-head{
+      margin: -26px -24px 18px -24px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .hero-flow{
+      display:inline-flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;
+      margin:0 0 14px 0; padding:8px 12px; border-radius:999px;
+      background: var(--accent-bg); border:1px solid var(--accent-border);
+      font-size:12px; font-weight:800; color:var(--text);
+    }
+    .hero-flow span{ display:inline-flex; align-items:center; gap:6px; }
+    .hero-flow .num{ width:26px; height:26px; border-radius:50%; background:var(--accent); color:var(--toast-text); display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; }
+    .hero-flow .arrow{ color:var(--muted); font-size:12px; }
+    .kicker{
+      display:inline-flex; gap:8px; align-items:center;
+      font-size:13px; color:var(--muted);
+      padding:8px 12px; border-radius:999px;
+      background: var(--accent-bg);
+      border:1px solid var(--accent-border);
+    }
+    .title{margin:0 0 6px; font-size:26px; line-height:1.35; letter-spacing:.02em; font-weight:900;}
+    .title-sub{ display:block; margin-top:4px; font-size:20px; font-weight:800; color:var(--accent); }
+    .subtitle{margin:0; max-width:92%; color:var(--muted); font-size:15px; line-height:1.65; font-weight:800;}
+
+    .hero-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:18px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .notice-card{
+      margin:18px 0 8px;
+      padding:18px 18px 14px;
+    }
+    .notice-card h2{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .notice-tag{
+      display:inline-flex;
+      align-items:center;
+      padding:2px 8px;
+      border-radius:999px;
+      background: var(--accent-bg);
+      color:var(--accent);
+      font-size:11px;
+      font-weight:900;
+      margin-left:auto;
+    }
+    .notice-list{
+      margin:10px 0 0;
+      padding-left:20px;
+      font-size:13px;
+      font-weight:800;
+      color:var(--muted);
+    }
+    .notice-list li+li{margin-top:4px;}
+    .notice-details{
+      margin-top:10px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:var(--card);
+      padding:8px 10px;
+    }
+    .notice-details summary{
+      list-style:none;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:900;
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .notice-details summary::marker{display:none;}
+    .notice-details summary span{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:800;
+    }
+    .notice-body{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+    }
+    .notice-body ul{
+      margin:4px 0 0;
+      padding-left:18px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px; padding:11px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:var(--card);
+      color:var(--text);
+      transition:.18s ease;
+      font-weight:900; font-size:14px;
+      cursor:pointer;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: var(--accent-border)}
+    .btn.primary{background: linear-gradient(135deg, var(--accent), var(--accent2)); color:var(--toast-text); border-color:var(--accent);}
+    .btn.ghost{background: var(--cream);}
+    .btn:focus{outline:none; box-shadow: var(--focus);}
+
+    .hero-side{
+      padding:18px; display:flex; flex-direction:column; gap:0; font-size: 1.05rem;
+    }
+    .hero-live-strip{
+      display:flex; align-items:flex-start; gap:10px;
+      padding:12px 14px; margin-bottom:12px;
+      border-radius:14px;
+      background: linear-gradient(135deg, var(--accent-bg) 0%, var(--cream) 100%);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .hero-live-ico{ font-size:1.25rem; line-height:1.2; flex-shrink:0; }
+    .hero-live-label{ font-size:11px; font-weight:900; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+    .hero-live-value{ margin:0; font-size:14px; font-weight:900; color:var(--text); line-height:1.45; }
+    .hero-rate-tabs{ position:relative; margin-top:0; }
+    .hero-tab-sr{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+    .hero-tab-bar{
+      display:flex; flex-wrap:wrap; gap:6px;
+      margin-bottom:10px;
+    }
+    .hero-tab-bar label{
+      cursor:pointer;
+      padding:8px 12px; border-radius:999px;
+      font-size:12px; font-weight:900;
+      color:var(--muted);
+      background:var(--card);
+      border:1px solid var(--line);
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+      flex:1 1 auto;
+      text-align:center;
+      min-width:0;
+    }
+    .hero-tab-bar label:hover{ border-color:var(--accent-border); color:var(--text); }
+    #heroRateTab1:checked ~ .hero-tab-bar label[for="heroRateTab1"],
+    #heroRateTab2:checked ~ .hero-tab-bar label[for="heroRateTab2"],
+    #heroRateTab3:checked ~ .hero-tab-bar label[for="heroRateTab3"]{
+      background: linear-gradient(135deg, var(--accent-bg) 0%, var(--cream) 100%);
+      border-color: var(--accent-border);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    .hero-tab-panels{ min-height:0; }
+    .hero-tab-panel{
+      display:none;
+      padding:0;
+    }
+    #heroRateTab1:checked ~ .hero-tab-panels .hero-tab-panel:nth-child(1),
+    #heroRateTab2:checked ~ .hero-tab-panels .hero-tab-panel:nth-child(2),
+    #heroRateTab3:checked ~ .hero-tab-panels .hero-tab-panel:nth-child(3){
+      display:block;
+    }
+    .hero-mini-table-wrap{
+      overflow-x:auto;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--card);
+      box-shadow: var(--shadow);
+    }
+    .hero-mini-table{
+      width:100%; border-collapse:collapse;
+      font-size:12px; font-weight:800;
+      color:var(--muted);
+    }
+    .hero-mini-table th,
+    .hero-mini-table td{
+      padding:8px 10px;
+      text-align:left;
+      vertical-align:top;
+      border-bottom:1px solid var(--line);
+    }
+    .hero-mini-table tr:last-child th,
+    .hero-mini-table tr:last-child td{ border-bottom:none; }
+    .hero-mini-table th{
+      width:34%;
+      min-width:7.5rem;
+      color:var(--text);
+      font-weight:950;
+      background:var(--accent-bg);
+    }
+    .hero-mini-table td{ line-height:1.45; }
+    .hero-mini-table td .coef{ color:var(--accent); font-weight:950; }
+    .hero-panel-subh{
+      margin:0 0 6px;
+      font-size:12px; font-weight:950;
+      color:var(--text);
+    }
+    .hero-panel-subh + .hero-mini-table-wrap{ margin-bottom:12px; }
+    .hero-panel-note{
+      margin:8px 0 0;
+      padding:8px 10px;
+      border-radius:10px;
+      background:var(--accent-bg);
+      border:1px solid var(--line);
+      font-size:12px; font-weight:800;
+      line-height:1.5;
+      color:var(--muted);
+    }
+    .hero-tab-note{
+      padding:14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--card);
+      box-shadow:var(--shadow);
+      font-size:14px;
+      font-weight:800;
+      color:var(--muted);
+      line-height:1.55;
+    }
+    .hero-tab-note p{ margin:0; }
+    .hero-side .hero-side-head{ margin: -18px -18px 12px -18px; border-radius: var(--radius) var(--radius) 0 0; }
+    .hero-side-note{ margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--line); font-size: 13px; font-weight: 800; color: var(--muted); line-height: 1.5; }
+    .hero-side .deposit-head h2{ font-size: 22px; }
+    .hero-tab-bar label:focus-visible{
+      outline: none;
+      box-shadow: var(--focus);
+    }
+    .rate-grid{ display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 4px; }
+    .rate-item{ display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--accent-bg); border-radius: 10px; border: 1px solid var(--line); }
+    .rate-item .yen{ font-weight: 900; color: var(--text); }
+    .rate-item .coef{ font-weight: 950; color: var(--accent); }
+    .rate-note{ margin: 10px 0 0 !important; font-size: 13px !important; color: var(--muted); }
+    .stat{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:14px; border-radius:16px;
+      background: var(--accent-bg);
+      border:1px solid var(--line);
+    }
+    .dot{width:10px; height:10px; border-radius:999px; margin-top:6px; background:var(--accent); box-shadow: 0 0 0 6px var(--accent-bg);}
+    .stat h3{margin:0; font-size:13px}
+    .stat p{margin:4px 0 0; color:var(--muted); font-size:12px}
+
+    /* ===== 可愛風：出發時間・日本當地時間區塊 ===== */
+    .time-toggle-wrap{ margin-top:12px; margin-bottom:4px; }
+    .time-toggle-btn{
+      width:100%; padding:16px 20px; border-radius:999px;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--card) 50%, var(--accent2) 100%);
+      border:2px solid var(--accent-border);
+      color:var(--text); font-size:16px; font-weight:800; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      box-shadow: var(--shadow);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .time-toggle-btn:hover{
+      transform:translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+      background: linear-gradient(135deg, var(--card) 0%, var(--cream) 50%, var(--accent-bg) 100%);
+    }
+    .time-bar{
+      display:none; grid-template-columns: 1fr 1fr; gap:18px; margin-top:14px;
+      padding:22px 22px; border-radius:24px;
+      background: linear-gradient(165deg, var(--card) 0%, var(--cream) 30%, var(--accent-bg) 100%);
+      border:2px dashed var(--accent-border);
+      font-size:15px; font-weight:800;
+      box-shadow: var(--shadow);
+    }
+    .time-bar.is-open{ display:grid; }
+    .time-bar .col{
+      padding:18px 18px; border-radius:20px;
+      background:var(--card); border:1px solid var(--line);
+    }
+    .time-bar .col h4{
+      margin:0 0 14px; font-size:16px; font-weight:900;
+      color:var(--text); letter-spacing:.04em;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .time-bar .col h4::before{
+      content:"✦"; color:var(--accent); font-size:14px;
+    }
+    .time-bar .col .time-row{
+      margin-bottom:12px; font-size:15px; color:var(--text);
+      line-height:1.5;
+    }
+    .time-bar .col .time-row:last-of-type{ margin-bottom:0; }
+    .time-bar .col .time-row .label{ color:var(--muted); font-weight:800; font-size:14px; }
+    .time-bar .col .time-row strong,
+    .time-bar .col .time-row .value{
+      font-size:17px; font-weight:900; color:var(--accent);
+    }
+    .time-bar .col .tw{ color:var(--text); font-size:15px; margin-bottom:10px; }
+    .time-bar .col .tw:last-of-type{ margin-bottom:0; }
+    .time-bar .col .live-tw{ margin-bottom:14px; }
+    .time-bar .col .live-tw strong{ font-size:18px; font-weight:900; color:var(--accent); }
+    .time-bar .col .diff{ font-size:15px; color:var(--muted); margin-top:10px; margin-bottom:0; }
+    .time-bar .col .live{ font-size:15px; color:var(--text); margin-top:0; margin-bottom:14px; }
+    .time-bar .col .live-jp{ margin-bottom:14px; }
+    .time-bar .col .live strong{ font-size:18px; font-weight:900; color:var(--accent); }
+    .time-bar .countdown{
+      margin-top:14px; padding:12px 14px; border-radius:16px;
+      background: var(--accent-bg);
+      border:1px solid var(--accent-border);
+      font-size:15px; color:var(--text);
+    }
+    .time-bar .countdown strong{ font-size:17px; font-weight:900; color:var(--accent); }
+    .japan-map-wrap{
+      margin-top:14px; border-radius:18px; overflow:hidden;
+      border:2px solid var(--line);
+      background: var(--cream);
+      box-shadow: var(--shadow);
+    }
+    .japan-map{display:block; width:100%; height:200px; border:none;}
+    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:16px;}
+    .section{padding:18px 18px 8px}
+    .section h2{margin:0 0 6px; font-size:16px; letter-spacing:.2px;}
+    .section p{margin:0 0 12px; color:var(--muted); font-size:13px}
+    .timeline{padding:0 18px 18px}
+    .day{display:grid; grid-template-columns: 90px 1fr; gap:12px; padding:12px 0; border-top: 1px solid var(--line);}
+    .day:first-child{border-top:none}
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:90px; padding:8px 10px;
+      border-radius:14px; font-weight:950;
+      background: var(--accent-bg);
+      border:1px solid var(--accent-border);
+      color:var(--text); font-size:13px;
+    }
+    .day h4{margin:0; font-size:14px}
+    .day ul{margin:6px 0 0; padding-left:16px; color:var(--muted); font-size:13px}
+    .tagrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    .tag{
+      display:inline-flex; align-items:center;
+      padding:5px 10px; border-radius:999px;
+      font-size:12px; font-weight:800;
+      background: var(--card);
+      border:1px solid var(--line);
+      color:var(--muted);
+    }
+
+    /* ===== 儲值區塊 ===== */
+    /* 儲值區塊顯示／隱藏改由 HTML 屬性 hidden 控制（見 #deposit） */
+    .deposit-head{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      padding:20px 22px; margin:0;
+      background: linear-gradient(135deg, var(--accent-bg) 0%, var(--cream) 100%);
+      border-bottom:2px solid var(--accent-border);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .deposit-head-inner{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .deposit-head .deposit-icon{
+      width:48px; height:48px; border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; line-height:1;
+    }
+    .deposit-head h2{ margin:0; font-size:20px; font-weight:900; color:var(--text); letter-spacing:.03em; }
+    .deposit-head-right{ border-radius: var(--radius); margin-bottom: 14px; }
+    .deposit-head .deposit-badge{
+      padding:6px 12px; border-radius:999px; font-size:13px; font-weight:900;
+      background: var(--card); border:1px solid var(--accent-border); color:var(--accent);
+    }
+    .deposit-intro{
+      padding:18px 22px 6px; margin:0;
+    }
+    .deposit-intro p{ margin:0 0 16px; font-size:15px; line-height:1.65; color:var(--muted); font-weight:800; }
+    .deposit-intro-bottom{ margin-top: 18px; }
+    .deposit-intro-bottom p{ margin:0; }
+    .deposit-wrap{padding: 10px 22px 22px;}
+    .deposit-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:0;
+      align-items:stretch;
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow:hidden;
+    }
+    .deposit-col-left{
+      padding: 16px 20px 20px;
+      background: linear-gradient(180deg, var(--card) 0%, var(--accent-bg) 50%);
+      border-right: 2px solid var(--line);
+    }
+    .deposit-col-right{
+      padding: 14px 20px 18px;
+      background: var(--accent-bg);
+    }
+    .deposit-left-hint{ margin-top:10px; color:var(--muted); font-size:13px; font-weight:800; }
+    .deposit-cards-header{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+    .deposit-cards-title{ font-size:14px; font-weight:900; color:var(--text); margin:0; }
+    .deposit-amount-buttons{ display:flex; gap:8px; flex-wrap:wrap; }
+    .deposit-amt-btn{
+      padding: 8px 16px;
+      min-width: 5.5rem;
+      border-radius: 999px;
+      border: 2px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .18s ease;
+      text-align: center;
+    }
+    .deposit-amt-btn:hover,
+    .deposit-amt-btn.active:hover{ border-color: var(--accent-border); background: var(--accent-bg); }
+    .deposit-amt-btn.active{
+      border-color: var(--line);
+      background: var(--card);
+      color: var(--text);
+    }
+    .deposit-cards{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    .dcard{
+      border-radius:18px;
+      border:2px solid var(--line);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding:16px;
+      cursor:pointer;
+      position:relative;
+      transition: .18s ease;
+    }
+    .dcard:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.1); }
+    .dcard.active{
+      border-color: var(--line);
+      box-shadow: var(--shadow);
+      background: var(--card);
+    }
+    .dcard .top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+    .dcard .amt{font-size:20px; font-weight:950; margin:0; color:var(--text); letter-spacing:.02em;}
+    .dcard .hint{margin:8px 0 0; font-size:13px; color:var(--muted); font-weight:800;}
+    .badge-mini{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 9px; border-radius:999px;
+      font-size:12px; font-weight:950;
+      border:1px solid var(--line);
+      background: var(--card);
+      color:var(--text);
+      white-space:nowrap;
+    }
+    .badge-mini.badge-abandon{
+      color:#3b0a0a;
+      background:rgba(180,35,24,.12);
+      border-color:rgba(180,35,24,.25);
+    }
+    .deposit-panel{
+      border-radius:0;
+      border:none;
+      background:transparent;
+      padding:0;
+    }
+    .formrow{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; align-items:center;}
+    .field{
+      flex:1;
+      min-width: 190px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .label{font-size:12px; font-weight:950; color:var(--text);}
+    .input{
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: var(--card);
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+    }
+    .input:focus{outline:none; box-shadow: var(--focus); border-color: var(--accent-border);}
+    .field-subtotal{ min-width: 200px; }
+    .deposit-subtotal{
+      display: block;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--cream);
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text);
+      min-height: 2.5em;
+      min-width: 10em;
+      box-sizing: border-box;
+    }
+    .preview{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      background: var(--card);
+      border:1px dashed var(--line);
+    }
+    .preview code{
+      display:block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      color:var(--text);
+      font-weight:800;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:20px;
+      transform:translateX(-50%);
+      background: var(--toast-bg);
+      color: var(--toast-text);
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:900;
+      font-size:13px;
+      box-shadow: var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition:.18s ease;
+      z-index:99;
+    }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(-2px);}
+
+    /* ===== 商品區 ===== */
+    .products{padding:0 18px 18px}
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; padding:0 18px 14px; align-items:center; justify-content:space-between;}
+    .search{
+      flex: 1; min-width: 220px;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:14px;
+      background: var(--card);
+      border:1px solid var(--line);
+    }
+    .search input{width:100%; background:transparent; border:none; outline:none; color:var(--text); font-size:14px; font-weight:800;}
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{
+      padding:8px 10px; border-radius:999px;
+      font-size:12px; color:var(--muted);
+      background: var(--card);
+      border:1px solid var(--line);
+      cursor:pointer; user-select:none; font-weight:900;
+    }
+    .chip.active{
+      color:var(--text);
+      background: linear-gradient(135deg, var(--accent-bg), var(--cream));
+      border-color: var(--accent-border);
+    }
+
+    .plist{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
+    .pitem{
+      padding:14px; border-radius:16px;
+      background: var(--card);
+      border:1px solid var(--line);
+      display:flex; flex-direction:column; gap:10px;
+      min-height: 170px; position:relative; overflow:hidden;
+    }
+    .pitem:before{
+      content:""; position:absolute; inset:-40px;
+      background: radial-gradient(circle at 20% 0%, var(--accent-bg), transparent 55%);
+      transform: rotate(8deg); pointer-events:none;
+    }
+    .phead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; position:relative;}
+    .pname{font-weight:950; font-size:14px; margin:0}
+    .pcat{font-size:12px; color:var(--muted); margin-top:2px; font-weight:900;}
+    .price{display:flex; flex-direction:column; gap:3px; text-align:right; position:relative;}
+    .twd{font-weight:950; font-size:16px}
+    .jpy{font-size:12px; color:var(--muted); font-weight:900;}
+    .pmeta{color:var(--muted); font-size:12px; margin:0; position:relative; font-weight:800;}
+    .pfoot{margin-top:auto; display:flex; gap:8px; flex-wrap:wrap; position:relative;}
+    .flag{
+      font-size:12px; font-weight:950;
+      padding:6px 9px; border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--card);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .flag.good{color:#0b2a1f; background: rgba(31,138,101,.14); border-color: rgba(31,138,101,.22);}
+    .flag.warn{color:#3a2a0b; background: rgba(183,121,31,.16); border-color: rgba(183,121,31,.22);}
+    .flag.bad{color:#3b0a0a; background: rgba(180,35,24,.12); border-color: rgba(180,35,24,.22);}
+
+    /* FAQ */
+    details{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: var(--card);
+      padding:12px 12px;
+      box-shadow: var(--shadow);
+      margin:10px 0;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:950;
+      color:var(--text);
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .faq-body{margin-top:10px; color:var(--muted); font-size:13px; font-weight:800;}
+    .faq-body ul{margin:8px 0 0; padding-left:18px;}
+    .inline-strong{font-weight:950; color:var(--text);}
+
+    .footer{
+      margin-top:18px; padding:18px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border:1px solid var(--line);
+      color:var(--muted); font-size:12px; font-weight:800;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    @media (max-width: 920px){
+      .hero{grid-template-columns:1fr}
+      .plist{grid-template-columns: repeat(2,1fr)}
+      .deposit-grid{grid-template-columns:1fr; gap:0;}
+      .deposit-col-left{border-right:none; border-bottom:2px solid var(--line);}
+      .deposit-col-right{border-top:none;}
+      .deposit-cards{grid-template-columns: repeat(3,1fr)}
+    }
+    @media (max-width: 560px){
+      .wrap{padding:18px 14px 40px}
+      .topbar{flex-direction:column; align-items:flex-start; gap:8px;}
+      .time-bar{grid-template-columns:1fr}
+      .plist{grid-template-columns: 1fr}
+      .day{grid-template-columns:1fr}
+      .badge{width:auto; justify-self:start}
+      .title{font-size:24px}
+      .corner{top:10px; right:10px}
+      .hero-actions{flex-direction:column; align-items:stretch;}
+      .hero-actions .btn{width:100%; justify-content:center;}
+      .deposit-cards{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="topbar-left"></div>
+      <div class="topbar-center">
+        <a href="index.html" class="topbar-entry" title="回首頁入口">回首頁入口</a>
+      </div>
+      <div class="topbar-right">
+        <div class="theme-switcher" role="group" aria-label="切換主題">
+          <button type="button" data-theme="default" aria-pressed="true">預設</button>
+          <button type="button" data-theme="wafu">和風</button>
+          <button type="button" data-theme="matcha">抹茶</button>
+          <button type="button" data-theme="dark">深色</button>
+          <button type="button" data-theme="forest">森林</button>
+        </div>
+        <div class="pill pill-trip" aria-label="行程日期">
+          <span class="trip-label">📅 行程</span>
+          <b id="tripRange" class="trip-dates">2026/04/26 – 2026/05/04（9天）</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- 出發時間 & 日本當地時間（點按鈕後展開） -->
+    <div class="time-toggle-wrap">
+      <button type="button" class="time-toggle-btn" id="btnShowTime" aria-expanded="false">
+        🕐 查看出發時間與日本當地時間
+      </button>
+      <div class="time-bar" id="timeBar">
+        <div class="col">
+          <h4>出發時間（台灣）</h4>
+          <div class="tw live-tw">目前台灣：<strong id="taiwanNow">--/--/-- --:--:--</strong></div>
+          <div class="tw" id="departureTW">出發：2026/04/26</div>
+          <div class="diff">回程：2026/05/04 台灣時間（依當日班機為準）</div>
+          <div class="countdown">距離出發：<strong id="departureCountdown">-- 天 -- 小時 -- 分 -- 秒</strong></div>
+        </div>
+        <div class="col">
+          <h4>日本當地時間</h4>
+          <div class="live live-jp">目前日本：<strong id="japanNow">--/--/-- --:--:--</strong></div>
+          <div class="japan-map-wrap">
+            <iframe
+              class="japan-map"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=129.0%2C31.0%2C146.0%2C45.5&layer=mapnik&marker=35.6762%2C139.6503"
+              title="日本地圖"
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card notice-card" id="noticeCard">
+      <h2>📢 公布欄 <span class="notice-tag">最新資訊</span></h2>
+      <ul class="notice-list" id="noticeList">
+        <li>目前尚無特別公告，行程與代購規則請參考下方說明。</li>
+      </ul>
+      <details class="notice-details">
+        <summary>
+          代購注意事項（重點版）
+          <span>點此展開 / 收合</span>
+        </summary>
+        <div class="notice-body">
+          <ul>
+            <li><strong>先儲值後喊單</strong>：未提供儲值編號的喊單不受理</li>
+            <li><strong>棄單處理</strong>：成單後取消視同棄單，<strong style="color:#dc2626;">儲值金不退</strong></li>
+            <li><strong>補款</strong>：差額以 7-11 賣貨便補款，回台後請於開單後 48 小時內完成</li>
+            <li><strong>預估價</strong>：採分級匯率計算；活動 / 缺貨 / 限購會影響實際成單</li>
+            <li><strong>國際運費</strong>：本次不另外收（人肉扛貨帶回）</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="card hero-main">
+        <header class="deposit-head">
+          <div class="deposit-head-inner">
+            <div class="deposit-icon" aria-hidden="true">📌</div>
+            <h2>先儲值再喊單</h2>
+          </div>
+        </header>
+        <div class="hero-flow">
+          <span><span class="num">1</span> 先儲值</span>
+          <span class="arrow">→</span>
+          <span><span class="num">2</span> 喊單</span>
+          <span class="arrow">→</span>
+          <span><span class="num">3</span> 成單補差額</span>
+        </div>
+        <p class="subtitle">
+          本次採「<strong>親飛連線前先儲值、後喊單</strong>」方案：只有完成儲值且取得<strong>儲值編號</strong>的喊單才會受理          成單後先扣儲值金；若總金額超過儲值金，出貨時以<strong>7-11 賣貨便</strong>補款（限 24 小時）        </p>
+      </div>
+
+      <div class="card hero-side">
+        <header class="deposit-head deposit-head-right hero-side-head">
+          <div class="deposit-head-inner">
+            <div class="deposit-icon" aria-hidden="true">📅</div>
+            <h2>連線說明</h2>
+          </div>
+        </header>
+
+        <div class="hero-live-strip">
+          <span class="hero-live-ico" aria-hidden="true">📅</span>
+          <div>
+            <div class="hero-live-label">連線代購日（暫定）</div>
+            <p class="hero-live-value" id="liveDays">Day 3、Day 6（日本時間晚間 20:00 左右）</p>
+          </div>
+        </div>
+
+        <div class="hero-rate-tabs">
+          <input type="radio" name="heroRateTab" id="heroRateTab1" class="hero-tab-sr" checked />
+          <input type="radio" name="heroRateTab" id="heroRateTab2" class="hero-tab-sr" />
+          <input type="radio" name="heroRateTab" id="heroRateTab3" class="hero-tab-sr" />
+          <div class="hero-tab-bar" role="tablist" aria-label="連線說明分類">
+            <label for="heroRateTab1" role="tab">通路／店家</label>
+            <label for="heroRateTab2" role="tab">扭蛋／盲盒</label>
+            <label for="heroRateTab3" role="tab">備註</label>
+          </div>
+          <div class="hero-tab-panels">
+            <div class="hero-tab-panel" role="tabpanel">
+              <div class="hero-mini-table-wrap">
+                <table class="hero-mini-table">
+                  <tbody>
+                    <tr>
+                      <th scope="row">超商（7-11／全家／Lawson）</th>
+                      <td>日幣 1,000 以上 <span class="coef">×0.33</span>；未滿以現場報價為準</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">唐吉軻德</th>
+                      <td>日幣 1,000 以上 <span class="coef">×0.31</span>；未滿以現場報價為準</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">日本大創（DAISO）</th>
+                      <td>日幣 1,000 以上 <span class="coef">×0.28</span>；未滿以現場報價為準</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">日本Avail</th>
+                      <td>日幣 1,000 以上 <span class="coef">×0.3</span>；未滿以現場報價為準</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">三麗鷗（Sanrio）</th>
+                      <td>日幣 1,000 以上 <span class="coef">×0.3</span>；未滿以現場報價為準</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Uniqlo、GU</th>
+                      <td><span class="coef">一般價格×0.3</span>；滿 5,000 日圓 <span class="coef">×0.28</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="hero-tab-panel" role="tabpanel">
+              <h3 class="hero-panel-subh">扭蛋</h3>
+              <div class="hero-mini-table-wrap">
+                <table class="hero-mini-table">
+                  <tbody>
+ 	<tr><th scope="row">100 日幣</th><td>台幣 60 元</td></tr>
+                    <tr><th scope="row">200 日幣</th><td>台幣 90 元</td></tr>
+                    <tr><th scope="row">300 日幣</th><td>台幣 130元</td></tr>
+                    <tr><th scope="row">400 日幣</th><td>台幣 150 元</td></tr>
+                    <tr><th scope="row">500 日幣</th><td>台幣 180 元</td></tr>
+                    <tr><th scope="row">600 日幣</th><td>台幣 200元</td></tr>
+                    <tr><th scope="row">700 日幣</th><td>台幣 220  元</td></tr>
+                    <tr><th scope="row">800 日幣</th><td>台幣 240 元</td></tr> 
+                  </tbody>
+                </table>
+              </div>
+              <p class="hero-panel-note">皆保留蛋殼蛋紙；若不需要蛋殼減NT$10元。外殼若本身稍微受損不屬於瑕疵品。</p>
+              <h3 class="hero-panel-subh">盲盒</h3>
+              <div class="hero-mini-table-wrap">
+                <table class="hero-mini-table">
+                  <tbody>
+                    <tr><th scope="row">100～199 円</th><td>NT$60</td></tr>
+                    <tr><th scope="row">200～299 円</th><td>NT$80</td></tr>
+                    <tr><th scope="row">300～399 円</th><td>NT$120</td></tr>
+                    <tr><th scope="row">400～499 円</th><td>NT$150</td></tr>
+                    <tr><th scope="row">500～599 円</th><td>NT$180</td></tr>
+                    <tr><th scope="row">600～699 円</th><td>NT$210</td></tr>
+                    <tr><th scope="row">700～799 円</th><td>NT$240</td></tr>
+                    <tr><th scope="row">800～899 円</th><td>NT$270</td></tr>
+                    <tr><th scope="row">900～999 円</th><td>NT$300</td></tr>
+                    <tr><th scope="row">1,000～1,199 円</th><td>NT$350</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="hero-tab-panel" role="tabpanel">
+              <div class="hero-tab-note">
+                <p><strong>國際運費：</strong>本次親飛代購價不加「<strong style="color:#dc2626;">國際運費</strong>」項目，回台後的賣貨便運費另計 NT$38 元。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card" id="faq" style="margin-top:16px;">
+      <div class="corner">
+        <div class="sticker blue"><span class="emo">🐰</span> FAQ</div>
+        <div class="sticker cream"><span class="emo">🐻</span> 先看這</div>
+      </div>
+      <div class="section">
+        <h2>FAQ</h2>
+        <p>常見問題</p>
+      </div>
+      <div class="deposit-wrap" style="padding-top:0;">
+        <details>
+          <summary>儲值效期是多久？<span class="badge-mini">有效期間</span></summary>
+          <div class="faq-body">
+            <ul>
+              <li>本次儲值金適用於 <span class="inline-strong" style="color:#dc2626;">2026/04/26 – 2026/05/04</span> 行程期間的連線代購</li>
+      
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>棄單怎麼處理？<span class="badge-mini badge-abandon">棄單</span></summary>
+          <div class="faq-body">
+            成單後取消視同棄單，<span class="inline-strong" style="color:#dc2626;">儲值金不退</span>          </div>
+        </details>
+
+        <details>
+          <summary>補款方式是什麼？多久要補？<span class="badge-mini">補款</span></summary>
+          <div class="faq-body">
+            <ul>
+              <li>成單後會先扣儲值金；若最終金額超過儲值金，會以 <span class="inline-strong" style="color:#dc2626;">7-11 賣貨便</span> 開立差額補款</li>
+              <li>補款期限：開單後 <span class="inline-strong" style="color:#dc2626;">48 小時內</span> 完成；逾期視同放棄，並依棄單規則處理</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>哪些商品不代購？<span class="badge-mini">代購範圍</span></summary>
+          <div class="faq-body">
+            <p>本賣場不代購以下商品：菸酒類商品、電器類商品及其他違禁品，敬請見諒與配合。</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>購買前請注意什麼？<span class="badge-mini">理性購物</span></summary>
+          <div class="faq-body">
+            <p>代購商品一經向日本店家購買，即<strong>無法取消、退貨或更換</strong>。</p>
+            <p style="margin-top:10px;"><strong>請在下單前再次確認：</strong></p>
+            <ul>
+              <li>商品價格</li>
+              <li>是否符合個人預算</li>
+              <li>是否確定需要購買</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>避免出現以下情況：</strong></p>
+            <ul>
+              <li>「朋友已經在日本幫我買了，想取消訂單」</li>
+              <li>「價格超出預算，想取消」</li>
+              <li>下單後未讀未回或直接消失</li>
+            </ul>
+            <p style="margin-top:10px;">以上情況皆會影響代購流程，請務必審慎下單。</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="toast" id="toast">已複製到剪貼簿 ✅</div>
+
+  <script>
+    // ====== 主題切換（記憶在 localStorage） ======
+    (function(){
+      var KEY = "maaru-theme";
+      var root = document.documentElement;
+      function setTheme(theme){
+        theme = theme || "default";
+        root.setAttribute("data-theme", theme);
+        document.querySelectorAll(".theme-switcher button").forEach(function(btn){
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-theme") === theme ? "true" : "false");
+        });
+        try { localStorage.setItem(KEY, theme); } catch(e) {}
+      }
+      var saved = "";
+      try { saved = localStorage.getItem(KEY) || ""; } catch(e) {}
+      if (["default","wafu","matcha","dark","forest"].indexOf(saved) >= 0) setTheme(saved);
+      document.querySelectorAll(".theme-switcher button").forEach(function(btn){
+        btn.addEventListener("click", function(){ setTheme(btn.getAttribute("data-theme")); });
+      });
+    })();
+    // ====== 你只需要改這裡（資料區） ======
+    const CONFIG = {
+      tripRangeText: "2026/04/26 – 2026/05/04（9天）",
+      liveDaysText: "Day 3、Day 6（暫定，日本時間晚間 20:00 左右）",
+      // 公布欄（可自行調整內容）
+      bulletins: [
+        // { type: "info", text: "這裡可以放最新公告，例如「本次行程仍在規劃中，實際代購日以 IG 公告為主」。" }
+      ],
+
+      // 儲值方案
+      depositPlans: [
+        { amount: 300, bonus: 30, label: "儲值300送30", badge: "入門推薦" },
+        { amount: 500, bonus: 60, label: "儲值500送60", badge: "熱門方案" },
+        { amount: 1000, bonus: 100, label: "儲值1000送100", badge: "高額回饋" },
+      ],
+      // 棄單規則
+      forfeitureRuleText: "成單後取消視同棄單，儲值金不退",
+      // 補款期限（小時）
+      topupHours: 48,
+
+      // 分級匯率（TWD/JPY）
+      fxTiers: [
+        { maxJPY: 1000, rate: 0.30 },
+        { maxJPY: 2000, rate: 0.28 },
+        { maxJPY: Infinity, rate: 0.27 },
+      ],
+      // 額外成本（你目前說不收國際運費 → 0）
+      extraCostRatio: 0,
+
+      itinerary: [
+        { day: "Day 1", title: "出發日｜抵達＆交通移動", items: ["抵達/交通移動", "踩點（不一定連線）"], tags:["移動日"] },
+        { day: "Day 2", title: "巡點日｜確認品項", items: ["門市/商場巡點", "確認可買清單與限購規則"], tags:["踩點","確認"] },
+        { day: "Day 3", title: "連線代購 Day（暫定）", items: ["白天採買", "晚間連線收單＋回覆"], tags:["連線","採買"] },
+        { day: "Day 4", title: "小旅行｜放風日", items: ["景點/散步/咖啡", "視情況補貨巡點"], tags:["旅行"] },
+        { day: "Day 5", title: "追加巡點", items: ["追加採買（視現場）", "整理未成單/缺貨回報"], tags:["追加","整理"] },
+        { day: "Day 6", title: "連線代購 Day（暫定）", items: ["白天追加採買", "晚間連線確認/收尾"], tags:["連線","收尾"] },
+        { day: "Day 7", title: "彈性日", items: ["補缺/找貨/行程彈性", "必要時短連線"], tags:["彈性"] },
+        { day: "Day 8", title: "整理日", items: ["整理清單/收尾", "準備返程"], tags:["整理"] },
+        { day: "Day 9", title: "回台日", items: ["返程移動", "回台後公告出貨/付款節點"], tags:["返程","公告"] },
+      ],
+
+      products: [
+        { name:"三麗鷗 愛心扣（角色款）", cat:"周邊", jpy: 980, note:"角色/顏色以現場為主", status:"hot" },
+        { name:"三麗鷗 收納筆袋", cat:"收納", jpy: 1650, note:"可放筆/小物", status:"ok" },
+        { name:"三麗鷗 收納包（小）", cat:"收納", jpy: 2200, note:"通勤小物包", status:"ok" },
+        { name:"三麗鷗 髮夾（2入）", cat:"飾品", jpy: 880, note:"可能限購", status:"hot" },
+        { name:"三麗鷗 零錢包", cat:"收納", jpy: 1980, note:"有機會出新色", status:"ok" },
+        { name:"限定店/快閃 特典（視情況）", cat:"特典", jpy: null, note:"特典不保證（先講清楚比較帥）", status:"maybe" },
+      ],
+
+      categories: ["全部","周邊","收納","飾品","特典"],
+    };
+
+    // ====== 工具 ======
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+    function formatTWD(n){
+      if(n == null || Number.isNaN(n)) return "—";
+      return "NT$ " + Math.round(n).toLocaleString("zh-Hant-TW");
+    }
+    function formatJPY(n){
+      if(n == null || Number.isNaN(n)) return "—";
+      return "JPY " + Math.round(n).toLocaleString("ja-JP");
+    }
+
+    function pickRateByJPY(jpy){
+      if(jpy == null) return null;
+      const tier = CONFIG.fxTiers.find(t => jpy <= t.maxJPY) || CONFIG.fxTiers[CONFIG.fxTiers.length - 1];
+      return tier.rate;
+    }
+    function estTWD(jpy){
+      if(jpy == null) return null;
+      const rate = pickRateByJPY(jpy);
+      const base = jpy * rate;
+      const extra = base * (CONFIG.extraCostRatio || 0);
+      return base + extra;
+    }
+    function rateLabel(jpy){
+      const r = pickRateByJPY(jpy);
+      return r == null ? "—" : `匯率：${r.toFixed(2)}`;
+    }
+    function statusFlag(s){
+      if(s === "hot") return `<span class="flag warn">🔥 熱門</span>`;
+      if(s === "ok") return `<span class="flag good">✅ 可跟</span>`;
+      if(s === "maybe") return `<span class="flag">🫧 看狀況</span>`;
+      return `<span class="flag">—</span>`;
+    }
+
+    // ====== 行程渲染 ======
+    function renderItinerary(){
+      const trip = $("#tripRange");
+      const live = $("#liveDays");
+      if(trip) trip.textContent = CONFIG.tripRangeText;
+      if(live) live.textContent = CONFIG.liveDaysText;
+      const el = $("#timeline");
+      if(!el) return;
+      el.innerHTML = CONFIG.itinerary.map(d => `
+        <div class="day">
+          <div class="badge">${d.day}</div>
+          <div>
+            <h4>${d.title}</h4>
+            <ul>${d.items.map(x=>`<li>${x}</li>`).join("")}</ul>
+            <div class="tagrow">${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ====== 公布欄渲染 ======
+    function renderNotice(){
+      const el = $("#noticeList");
+      if(!el) return;
+      const items = CONFIG.bulletins || [];
+      if(!items.length){
+        el.innerHTML = `<li>目前尚無特別公告，行程與代購規則請參考下方說明。</li>`;
+        return;
+      }
+      el.innerHTML = items.map(b => {
+        const prefix = b.type === "warn" ? "⚠️ " : b.type === "info" ? "ℹ️ " : "• ";
+        return `<li>${prefix}${b.text}</li>`;
+      }).join("");
+    }
+
+
+    // ====== 商品渲染 ======
+    let activeCat = "全部";
+    let query = "";
+
+    function renderChips(){
+      const el = $("#chips");
+      el.innerHTML = CONFIG.categories.map(c => `
+        <span class="chip ${c===activeCat?'active':''}" data-cat="${c}">${c}</span>
+      `).join("");
+      $$("#chips .chip").forEach(ch => {
+        ch.addEventListener("click", () => {
+          activeCat = ch.dataset.cat;
+          renderChips();
+          renderProducts();
+        });
+      });
+    }
+
+    function renderProducts(){
+      const list = CONFIG.products
+        .filter(p => activeCat==="全部" ? true : p.cat===activeCat)
+        .filter(p => {
+          const hay = (p.name + " " + p.cat + " " + (p.note||"")).toLowerCase();
+          return hay.includes(query.toLowerCase());
+        });
+
+      const el = $("#plist");
+      el.innerHTML = list.map(p => {
+        const twd = estTWD(p.jpy);
+        return `
+          <div class="pitem">
+            <div class="phead">
+              <div>
+                <p class="pname">${p.name}</p>
+                <div class="pcat">${p.cat}</div>
+              </div>
+              <div class="price">
+                <div class="twd">${formatTWD(twd)}</div>
+                <div class="jpy">${formatJPY(p.jpy)}</div>
+              </div>
+            </div>
+            <p class="pmeta">${p.note || ""}</p>
+            <div class="pfoot">
+              ${statusFlag(p.status)}
+              <span class="flag">${rateLabel(p.jpy)}</span>
+              ${CONFIG.extraCostRatio ? `<span class="flag">加成：${Math.round(CONFIG.extraCostRatio*100)}%</span>` : `<span class="flag">國際運費：不收</span>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      if(list.length === 0){
+        el.innerHTML = `<div class="pitem" style="grid-column: 1/-1;">
+          <p class="pname" style="margin:0;">找不到符合條件的商品</p>
+          <p class="pmeta" style="margin:6px 0 0;">換個關鍵字或切換類別試試</p>
+        </div>`;
+      }
+    }
+
+    function bindSearch(){
+      $("#q").addEventListener("input", (e)=>{
+        query = e.target.value || "";
+        renderProducts();
+      });
+    }
+
+    // ====== 儲值方案卡片 + 複製 ======
+    let selectedDeposit = CONFIG.depositPlans[1]?.amount ?? 500;
+
+    function renderDepositCards(){
+      const el = $("#depositCards");
+      if(!el) return;
+      // 同步金額按鈕的 active 狀態（按鈕已在 HTML 內）
+      $$("#depositAmountBtns .deposit-amt-btn").forEach(btn=>{
+        btn.classList.toggle("active", Number(btn.dataset.amt) === selectedDeposit);
+      });
+
+      el.innerHTML = CONFIG.depositPlans.map(p => `
+        <div class="dcard ${p.amount===selectedDeposit?'active':''}" data-amt="${p.amount}">
+          <div class="top">
+            <div>
+              <p class="amt">NT$ ${p.amount.toLocaleString("zh-Hant-TW")}</p>
+              <div class="hint">${p.label}</div>
+            </div>
+            <span class="badge-mini">${p.badge}</span>
+          </div>
+          <div class="hint" style="margin-top:10px;">
+            NT$${p.amount} 贈送 $${p.bonus != null ? p.bonus : ''}｜成單先扣 ${p.amount}｜超額再補
+          </div>
+        </div>
+      `).join("");
+
+      $$("#depositCards .dcard").forEach(card=>{
+        card.addEventListener("click", ()=>{
+          selectedDeposit = Number(card.dataset.amt);
+          renderDepositCards();
+          updatePreview();
+        });
+      });
+    }
+
+    function bindDepositAmountBtns(){
+      const amtBtns = $$("#depositAmountBtns .deposit-amt-btn");
+      if(!amtBtns.length) return;
+      amtBtns.forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          selectedDeposit = Number(btn.dataset.amt);
+          renderDepositCards();
+          updatePreview();
+        });
+      });
+    }
+
+    function parseNum(val){
+        if(!val || typeof val !== "string") return NaN;
+        var s = val.replace(/[^0-9.]/g, "");
+        return s === "" ? NaN : parseFloat(s);
+      }
+    function formatTWDNum(n){
+        try { return n.toLocaleString("zh-TW"); } catch(e) { return String(n); }
+      }
+    function getItemCalc(){
+        var q = document.getElementById("itemQty"), p = document.getElementById("itemPrice");
+        var qtyStr = (q && q.value || "").trim();
+        var priceStr = (p && p.value || "").trim();
+        var qty = parseNum(qtyStr);
+        var unitPrice = parseNum(priceStr);
+        if(isNaN(qty)) qty = 1;
+        if(isNaN(unitPrice)) return { qty: qtyStr || "1", unit: priceStr || "價格待報", total: null, totalStr: "－", unitStr: priceStr || "價格待報", isCalculated: false };
+        var total = Math.round(qty * unitPrice);
+        return { qty: String(qty), unit: unitPrice, total: total, totalStr: "NT$" + formatTWDNum(total), unitStr: "NT$" + formatTWDNum(unitPrice), isCalculated: true };
+      }
+    function buildCopyText(){
+        var w = document.getElementById("walletId"), n = document.getElementById("nickname");
+        var i = document.getElementById("itemText");
+        var walletId = (w && w.value || "").trim();
+        var nickname = (n && n.value || "").trim();
+        var itemText = (i && i.value || "").trim();
+
+        if(!walletId) return "請先輸入儲值編號";
+        if(!nickname) return "請先輸入社群暱稱";
+
+        var calc = getItemCalc();
+        var part = (itemText || "商品/規格") + " 數量：" + calc.qty + " 單價：" + (calc.unitStr || calc.unit) + (calc.total !== null ? " 小計：" + calc.totalStr : "");
+        return walletId + "｜" + nickname + " " + part;
+     }
+
+    function updateSubtotal(){
+      var sub = document.getElementById("itemSubtotal");
+      if(!sub) return;
+      var calc = getItemCalc();
+      sub.textContent = calc.isCalculated ? calc.totalStr + "（自動計算）" : "－ 請輸入數量與單價";
+    }
+    function updatePreview(){
+      var el = document.getElementById("copyPreview");
+      if(el) el.textContent = buildCopyText();
+      updateSubtotal();
+    }
+
+    function copyToClipboard(){
+      var text = buildCopyText();
+      if(text === "請先輸入儲值編號") {
+        var w = document.getElementById("walletId"); if(w) w.focus();
+        showToast("請先輸入儲值編號");
+        return;
+      }
+      if(text === "請先輸入社群暱稱") {
+        var n = document.getElementById("nickname"); if(n) n.focus();
+        showToast("請先輸入社群暱稱");
+        return;
+      }
+      if(typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        navigator.clipboard.writeText(text).then(function(){
+          showToast("已複製到剪貼簿 ✅");
+        }).catch(function(){
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    }
+    function fallbackCopy(text){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      try {
+        document.execCommand("copy");
+        showToast("已複製到剪貼簿 ✅");
+      } catch(err) {}
+      document.body.removeChild(ta);
+    }
+
+    let toastTimer = null;
+    function showToast(msg){
+      var t = document.getElementById("toast");
+      if(!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1400);
+    }
+
+    function bindDepositCopy(){
+      var w = document.getElementById("walletId"), n = document.getElementById("nickname");
+      var i = document.getElementById("itemText"), q = document.getElementById("itemQty"), p = document.getElementById("itemPrice"), btn = document.getElementById("copyBtn");
+      if(w){ w.addEventListener("input", updatePreview); }
+      if(n){ n.addEventListener("input", updatePreview); }
+      if(i){ i.addEventListener("input", updatePreview); }
+      if(q){ q.addEventListener("input", updatePreview); q.addEventListener("change", updatePreview); }
+      if(p){ p.addEventListener("input", updatePreview); p.addEventListener("change", updatePreview); }
+      if(btn){ btn.addEventListener("click", function(e){ e.preventDefault(); copyToClipboard(); }); }
+      updatePreview();
+      updateSubtotal();
+      setTimeout(updateSubtotal, 100);
+    }
+
+    // 日本當地時間（即時，日期+時間與左欄一致）
+    function updateJapanTime(){
+      const el = document.getElementById("japanNow");
+      if(!el) return;
+      const now = new Date();
+      const japan = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+      const y = japan.getFullYear(), M = japan.getMonth()+1, d = japan.getDate();
+      const h = japan.getHours(), m = japan.getMinutes(), s = japan.getSeconds();
+      el.textContent = y + "/" + String(M).padStart(2,"0") + "/" + String(d).padStart(2,"0") + " " +
+        [h,m,s].map(function(v){ return String(v).padStart(2,"0"); }).join(":");
+    }
+
+    function updateTaiwanTime(){
+      const el = document.getElementById("taiwanNow");
+      if(!el) return;
+      const now = new Date();
+      const tw = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Taipei" }));
+      const y = tw.getFullYear(), M = tw.getMonth()+1, d = tw.getDate();
+      const h = tw.getHours(), m = tw.getMinutes(), s = tw.getSeconds();
+      el.textContent = y + "/" + String(M).padStart(2,"0") + "/" + String(d).padStart(2,"0") + " " +
+        [h,m,s].map(function(v){ return String(v).padStart(2,"0"); }).join(":");
+    }
+
+    // 出發時間倒數（台灣時間 2026/04/26 06:00）
+    function updateDepartureCountdown(){
+      const el = document.getElementById("departureCountdown");
+      if(!el) return;
+      const departure = new Date("2026-04-26T06:00:00+08:00");
+      const now = new Date();
+      const diff = departure - now;
+      if(diff <= 0){
+        el.textContent = "已出發／行程中";
+        return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.textContent = d + " 天 " + h + " 小時 " + m + " 分 " + s + " 秒";
+    }
+
+    setInterval(function(){ updateTaiwanTime(); updateJapanTime(); updateDepartureCountdown(); }, 1000);
+    updateTaiwanTime();
+    updateJapanTime();
+    updateDepartureCountdown();
+
+    // 出發時間／日本時差：點按鈕展開／收合
+    (function(){
+      const btn = document.getElementById("btnShowTime");
+      const bar = document.getElementById("timeBar");
+      if(!btn || !bar) return;
+      btn.addEventListener("click", function(){
+        const isOpen = bar.classList.toggle("is-open");
+        btn.setAttribute("aria-expanded", isOpen);
+        btn.innerHTML = isOpen ? "▲ 收合" : "🕐 查看出發時間與日本當地時間";
+      });
+    })();
+
+    // init
+    (function doInit(){
+      renderItinerary();
+      renderNotice();
+      renderChips();
+      renderProducts();
+      bindSearch();
+      renderDepositCards();
+      bindDepositAmountBtns();
+      bindDepositCopy();
+    })();
+  </script>
+  <div class="footer">
+    <div>此頁面為此次東京親飛連線專用資訊頁，僅針對本期行程與代購說明使用</div>
+  </div>
+</body>
+</html>
